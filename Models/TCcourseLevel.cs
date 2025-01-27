@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TCcourseLevel
+{
+    public int LevelId { get; set; }
+
+    public string? LevelName { get; set; }
+
+    public virtual ICollection<TCcourse> TCcourses { get; set; } = new List<TCcourse>();
+}

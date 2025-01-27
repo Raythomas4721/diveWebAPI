@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TMmemberList
+{
+    public int MemberId { get; set; }
+
+    public string? MemberName { get; set; }
+
+    public string? MemberGender { get; set; }
+
+    public string? MemberPhone { get; set; }
+
+    public string? MemberEmail { get; set; }
+
+    public string? MemberAddress { get; set; }
+
+    public string? MemberPassword { get; set; }
+
+    public string? UrgentContact { get; set; }
+
+    public string? UrgentPhone { get; set; }
+
+    public byte[]? MemberPhoto { get; set; }
+
+    public DateTime? RecentLogin { get; set; }
+
+    public bool? Status { get; set; }
+
+    public string? ThirdPartyId { get; set; }
+
+    public string? ThirdPartyProvider { get; set; }
+
+    public virtual ICollection<TCcourseReview> TCcourseReviews { get; set; } = new List<TCcourseReview>();
+
+    public virtual ICollection<TCorder> TCorders { get; set; } = new List<TCorder>();
+
+    public virtual ICollection<TMfavoriteList> TMfavoriteLists { get; set; } = new List<TMfavoriteList>();
+
+    public virtual ICollection<TMmemberDivingLevel> TMmemberDivingLevels { get; set; } = new List<TMmemberDivingLevel>();
+
+    public virtual ICollection<TNcart> TNcarts { get; set; } = new List<TNcart>();
+
+    public virtual ICollection<TNorder> TNorders { get; set; } = new List<TNorder>();
+
+    public virtual ICollection<TNreview> TNreviews { get; set; } = new List<TNreview>();
+
+    public virtual ICollection<TSorder> TSorders { get; set; } = new List<TSorder>();
+
+    public virtual ICollection<TSshoppingCart> TSshoppingCarts { get; set; } = new List<TSshoppingCart>();
+
+    public virtual ICollection<TUorder> TUorders { get; set; } = new List<TUorder>();
+
+    public virtual ICollection<TUproduct> TUproducts { get; set; } = new List<TUproduct>();
+}

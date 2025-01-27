@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TNproductvariant
+{
+    public int ProductvariantsId { get; set; }
+
+    public int? ProductId { get; set; }
+
+    public int? SizeId { get; set; }
+
+    public int? ColorId { get; set; }
+
+    public int? ThicknessId { get; set; }
+
+    public int? GenderId { get; set; }
+
+    public int? Stock { get; set; }
+
+    public virtual TNcolor? Color { get; set; }
+
+    public virtual TNgender? Gender { get; set; }
+
+    public virtual TNproduct? Product { get; set; }
+
+    public virtual TNsize? Size { get; set; }
+
+    public virtual ICollection<TNcartItem> TNcartItems { get; set; } = new List<TNcartItem>();
+
+    public virtual ICollection<TNorderDetail> TNorderDetails { get; set; } = new List<TNorderDetail>();
+
+    public virtual TNthickness? Thickness { get; set; }
+}
