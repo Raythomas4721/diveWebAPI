@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TMfavoriteList
+{
+    public int FavoriteId { get; set; }
+
+    public int? MemberId { get; set; }
+
+    public int? FavoriteItem { get; set; }
+
+    public DateOnly? CreateDate { get; set; }
+
+    public virtual TMmemberList? Member { get; set; }
+}

@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TMcoachDivingLevel
+{
+    public int DivingLevelId { get; set; }
+
+    public int? LevelId { get; set; }
+
+    public int? CoachId { get; set; }
+
+    public virtual TMcoach? Coach { get; set; }
+
+    public virtual TMdivingLevel? Level { get; set; }
+}

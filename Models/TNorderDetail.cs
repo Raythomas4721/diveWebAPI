@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TNorderDetail
+{
+    public int OrderDetailsId { get; set; }
+
+    public int? OrderId { get; set; }
+
+    public int? ProductvariantsId { get; set; }
+
+    public int? Subtotal { get; set; }
+
+    public decimal? UnitPriceAtOrder { get; set; }
+
+    public int? Quantity { get; set; }
+
+    public decimal? DiscountAmount { get; set; }
+
+    public virtual TNorder? Order { get; set; }
+
+    public virtual TNproductvariant? Productvariants { get; set; }
+
+    public virtual TNdiscount? SubtotalNavigation { get; set; }
+
+    public virtual ICollection<TNreview> TNreviews { get; set; } = new List<TNreview>();
+}

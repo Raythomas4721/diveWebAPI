@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TMdivingStyle
+{
+    public int DivingStyleId { get; set; }
+
+    public string? DivingStyle { get; set; }
+
+    public virtual ICollection<TMcoachDiving> TMcoachDivings { get; set; } = new List<TMcoachDiving>();
+}

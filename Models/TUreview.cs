@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TUreview
+{
+    public int ReviewId { get; set; }
+
+    public int? OrderDetailsId { get; set; }
+
+    public int? ReviewRating { get; set; }
+
+    public string? ReviewComment { get; set; }
+
+    public DateTime? ReviewDate { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? BuyerId { get; set; }
+
+    public int? SellerId { get; set; }
+
+    public virtual TUorderDetail? OrderDetails { get; set; }
+}

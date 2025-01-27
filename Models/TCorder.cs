@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TCorder
+{
+    public int OrderId { get; set; }
+
+    public int? MemberId { get; set; }
+
+    public DateTime? OrderDate { get; set; }
+
+    public virtual TMmemberList? Member { get; set; }
+
+    public virtual ICollection<TCcourseReview> TCcourseReviews { get; set; } = new List<TCcourseReview>();
+
+    public virtual ICollection<TCorderDetail> TCorderDetails { get; set; } = new List<TCorderDetail>();
+}
