@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace diveWebAPI.Models;
+
+public partial class TUproduct
+{
+    public int UproductId { get; set; }
+
+    public int? SellerId { get; set; }
+
+    public int? CategoryId { get; set; }
+
+    public string? ProductName { get; set; }
+
+    public string? ProductDescription { get; set; }
+
+    public decimal? ProductPrice { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+
+    public int? ProductConditionId { get; set; }
+
+    public bool? ProductStatus { get; set; }
+
+    public virtual TUcategory? Category { get; set; }
+
+    public virtual TUproductCondition? ProductCondition { get; set; }
+
+    public virtual TMmemberList? Seller { get; set; }
+
+    public virtual ICollection<TNcartItem> TNcartItems { get; set; } = new List<TNcartItem>();
+
+    public virtual ICollection<TUorderDetail> TUorderDetails { get; set; } = new List<TUorderDetail>();
+
+    public virtual ICollection<TUproductImage> TUproductImages { get; set; } = new List<TUproductImage>();
+}

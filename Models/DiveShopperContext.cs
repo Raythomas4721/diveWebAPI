@@ -1,0 +1,1127 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+
+namespace diveWebAPI.Models;
+
+public partial class DiveShopperContext : DbContext
+{
+    public DiveShopperContext(DbContextOptions<DiveShopperContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<TCcourse> TCcourses { get; set; }
+
+    public virtual DbSet<TCcourseCategory> TCcourseCategories { get; set; }
+
+    public virtual DbSet<TCcourseFavorite> TCcourseFavorites { get; set; }
+
+    public virtual DbSet<TCcourseLevel> TCcourseLevels { get; set; }
+
+    public virtual DbSet<TCcourseReview> TCcourseReviews { get; set; }
+
+    public virtual DbSet<TCorder> TCorders { get; set; }
+
+    public virtual DbSet<TCorderDetail> TCorderDetails { get; set; }
+
+    public virtual DbSet<TMadmin> TMadmins { get; set; }
+
+    public virtual DbSet<TMcoach> TMcoaches { get; set; }
+
+    public virtual DbSet<TMcoachDiving> TMcoachDivings { get; set; }
+
+    public virtual DbSet<TMcoachDivingLevel> TMcoachDivingLevels { get; set; }
+
+    public virtual DbSet<TMdivingLevel> TMdivingLevels { get; set; }
+
+    public virtual DbSet<TMdivingLevelName> TMdivingLevelNames { get; set; }
+
+    public virtual DbSet<TMdivingStyle> TMdivingStyles { get; set; }
+
+    public virtual DbSet<TMfavoriteList> TMfavoriteLists { get; set; }
+
+    public virtual DbSet<TMmemberDivingLevel> TMmemberDivingLevels { get; set; }
+
+    public virtual DbSet<TMmemberList> TMmemberLists { get; set; }
+
+    public virtual DbSet<TNcart> TNcarts { get; set; }
+
+    public virtual DbSet<TNcartItem> TNcartItems { get; set; }
+
+    public virtual DbSet<TNcolor> TNcolors { get; set; }
+
+    public virtual DbSet<TNdiscount> TNdiscounts { get; set; }
+
+    public virtual DbSet<TNgender> TNgenders { get; set; }
+
+    public virtual DbSet<TNorder> TNorders { get; set; }
+
+    public virtual DbSet<TNorderDetail> TNorderDetails { get; set; }
+
+    public virtual DbSet<TNpicture> TNpictures { get; set; }
+
+    public virtual DbSet<TNproduct> TNproducts { get; set; }
+
+    public virtual DbSet<TNproductCategory> TNproductCategories { get; set; }
+
+    public virtual DbSet<TNproductcategoryMapping> TNproductcategoryMappings { get; set; }
+
+    public virtual DbSet<TNproductvariant> TNproductvariants { get; set; }
+
+    public virtual DbSet<TNreview> TNreviews { get; set; }
+
+    public virtual DbSet<TNsize> TNsizes { get; set; }
+
+    public virtual DbSet<TNthickness> TNthicknesses { get; set; }
+
+    public virtual DbSet<TScollect> TScollects { get; set; }
+
+    public virtual DbSet<TSevaluate> TSevaluates { get; set; }
+
+    public virtual DbSet<TSorder> TSorders { get; set; }
+
+    public virtual DbSet<TSorderDetail> TSorderDetails { get; set; }
+
+    public virtual DbSet<TSphoto> TSphotos { get; set; }
+
+    public virtual DbSet<TSshoppingCart> TSshoppingCarts { get; set; }
+
+    public virtual DbSet<TSsiteDetail> TSsiteDetails { get; set; }
+
+    public virtual DbSet<TUcategory> TUcategories { get; set; }
+
+    public virtual DbSet<TUorder> TUorders { get; set; }
+
+    public virtual DbSet<TUorderDetail> TUorderDetails { get; set; }
+
+    public virtual DbSet<TUorderLog> TUorderLogs { get; set; }
+
+    public virtual DbSet<TUorderStatusId> TUorderStatusIds { get; set; }
+
+    public virtual DbSet<TUproduct> TUproducts { get; set; }
+
+    public virtual DbSet<TUproductCondition> TUproductConditions { get; set; }
+
+    public virtual DbSet<TUproductImage> TUproductImages { get; set; }
+
+    public virtual DbSet<TUreview> TUreviews { get; set; }
+
+    public virtual DbSet<VwCourseDetail> VwCourseDetails { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TCcourse>(entity =>
+        {
+            entity.HasKey(e => e.CourseId);
+
+            entity.ToTable("tCcourses");
+
+            entity.Property(e => e.CourseId).HasColumnName("courseId");
+            entity.Property(e => e.CoachId).HasColumnName("coachId");
+            entity.Property(e => e.CourseCategoryId).HasColumnName("courseCategoryId");
+            entity.Property(e => e.CoursePrice)
+                .HasColumnType("money")
+                .HasColumnName("coursePrice");
+            entity.Property(e => e.CourseStatus).HasColumnName("courseStatus");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.Discription)
+                .HasMaxLength(100)
+                .HasColumnName("discription");
+            entity.Property(e => e.LevelId).HasColumnName("levelId");
+            entity.Property(e => e.Photo)
+                .HasColumnType("image")
+                .HasColumnName("photo");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("updatedAt");
+
+            entity.HasOne(d => d.Coach).WithMany(p => p.TCcourses)
+                .HasForeignKey(d => d.CoachId)
+                .HasConstraintName("FK_tCcourses_tMcoaches");
+
+            entity.HasOne(d => d.CourseCategory).WithMany(p => p.TCcourses)
+                .HasForeignKey(d => d.CourseCategoryId)
+                .HasConstraintName("FK_tCcourses_tCcourseCategory");
+
+            entity.HasOne(d => d.Level).WithMany(p => p.TCcourses)
+                .HasForeignKey(d => d.LevelId)
+                .HasConstraintName("FK_tCcourses_tCcourseLevel");
+        });
+
+        modelBuilder.Entity<TCcourseCategory>(entity =>
+        {
+            entity.HasKey(e => e.CourseCategoryId);
+
+            entity.ToTable("tCcourseCategory");
+
+            entity.Property(e => e.CourseCategoryId).HasColumnName("courseCategoryId");
+            entity.Property(e => e.CategoryName)
+                .HasMaxLength(50)
+                .HasColumnName("categoryName");
+            entity.Property(e => e.Description)
+                .HasMaxLength(200)
+                .HasColumnName("description");
+            entity.Property(e => e.Duration).HasColumnName("duration");
+            entity.Property(e => e.Quota).HasColumnName("quota");
+        });
+
+        modelBuilder.Entity<TCcourseFavorite>(entity =>
+        {
+            entity.HasKey(e => e.CourseFavoriteId);
+
+            entity.ToTable("tCcourseFavorite");
+
+            entity.Property(e => e.CourseFavoriteId).HasColumnName("courseFavoriteId");
+            entity.Property(e => e.CourseId).HasColumnName("courseId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.TCcourseFavorites)
+                .HasForeignKey(d => d.CourseId)
+                .HasConstraintName("FK_tCcourseFavorite_tCcourses");
+        });
+
+        modelBuilder.Entity<TCcourseLevel>(entity =>
+        {
+            entity.HasKey(e => e.LevelId);
+
+            entity.ToTable("tCcourseLevel");
+
+            entity.Property(e => e.LevelId).HasColumnName("levelId");
+            entity.Property(e => e.LevelName)
+                .HasMaxLength(50)
+                .HasColumnName("levelName");
+        });
+
+        modelBuilder.Entity<TCcourseReview>(entity =>
+        {
+            entity.HasKey(e => e.CourseReviewId);
+
+            entity.ToTable("tCcourseReview");
+
+            entity.Property(e => e.CourseReviewId).HasColumnName("courseReviewId");
+            entity.Property(e => e.CourseId).HasColumnName("courseId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.Rating).HasColumnName("rating");
+            entity.Property(e => e.ReviewDate)
+                .HasColumnType("datetime")
+                .HasColumnName("reviewDate");
+            entity.Property(e => e.ReviewText)
+                .HasMaxLength(100)
+                .HasColumnName("reviewText");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.TCcourseReviews)
+                .HasForeignKey(d => d.CourseId)
+                .HasConstraintName("FK_tCcourseReview_tCcourses");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TCcourseReviews)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tCcourseReview_tMmemberList");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.TCcourseReviews)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK_tCcourseReview_tCorders");
+        });
+
+        modelBuilder.Entity<TCorder>(entity =>
+        {
+            entity.HasKey(e => e.OrderId);
+
+            entity.ToTable("tCorders");
+
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderDate)
+                .HasColumnType("datetime")
+                .HasColumnName("orderDate");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TCorders)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tCorders_tMmemberList");
+        });
+
+        modelBuilder.Entity<TCorderDetail>(entity =>
+        {
+            entity.HasKey(e => e.OrderDetailId);
+
+            entity.ToTable("tCorderDetails");
+
+            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
+            entity.Property(e => e.CourseId).HasColumnName("courseId");
+            entity.Property(e => e.CoursePrice)
+                .HasColumnType("money")
+                .HasColumnName("coursePrice");
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.TCorderDetails)
+                .HasForeignKey(d => d.CourseId)
+                .HasConstraintName("FK_tCorderDetails_tCcourses");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.TCorderDetails)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK_tCorderDetails_tCorders");
+        });
+
+        modelBuilder.Entity<TMadmin>(entity =>
+        {
+            entity.HasKey(e => e.AdminId);
+
+            entity.ToTable("tMadmin");
+
+            entity.Property(e => e.AdminId).HasColumnName("adminId");
+            entity.Property(e => e.CreateAt)
+                .HasColumnType("datetime")
+                .HasColumnName("createAt");
+            entity.Property(e => e.Email)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("email");
+            entity.Property(e => e.LastLogin)
+                .HasColumnType("datetime")
+                .HasColumnName("lastLogin");
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("passwordHash");
+            entity.Property(e => e.RoleName)
+                .HasMaxLength(50)
+                .HasColumnName("roleName");
+            entity.Property(e => e.UserName)
+                .HasMaxLength(50)
+                .HasColumnName("userName");
+        });
+
+        modelBuilder.Entity<TMcoach>(entity =>
+        {
+            entity.HasKey(e => e.CoachId).HasName("PK_coaches");
+
+            entity.ToTable("tMcoaches");
+
+            entity.Property(e => e.CoachId).HasColumnName("coachId");
+            entity.Property(e => e.CoachName)
+                .HasMaxLength(50)
+                .HasColumnName("coachName");
+            entity.Property(e => e.CoachPhone)
+                .HasMaxLength(20)
+                .HasColumnName("coachPhone");
+            entity.Property(e => e.CoachPhoto).HasColumnName("coachPhoto");
+            entity.Property(e => e.DivingStyleId).HasColumnName("divingStyleId");
+            entity.Property(e => e.Experience)
+                .HasMaxLength(50)
+                .HasColumnName("experience");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(10)
+                .HasColumnName("gender");
+        });
+
+        modelBuilder.Entity<TMcoachDiving>(entity =>
+        {
+            entity.HasKey(e => e.CoachDivingId).HasName("PK_coachDiving");
+
+            entity.ToTable("tMcoachDiving");
+
+            entity.Property(e => e.CoachDivingId).HasColumnName("coachDivingId");
+            entity.Property(e => e.CoachId).HasColumnName("coachId");
+            entity.Property(e => e.DivingStyleId).HasColumnName("divingStyleId");
+
+            entity.HasOne(d => d.Coach).WithMany(p => p.TMcoachDivings)
+                .HasForeignKey(d => d.CoachId)
+                .HasConstraintName("FK_tMcoachDiving_tMcoaches");
+
+            entity.HasOne(d => d.DivingStyle).WithMany(p => p.TMcoachDivings)
+                .HasForeignKey(d => d.DivingStyleId)
+                .HasConstraintName("FK_tMcoachDiving_tMdivingStyle");
+        });
+
+        modelBuilder.Entity<TMcoachDivingLevel>(entity =>
+        {
+            entity.HasKey(e => e.DivingLevelId);
+
+            entity.ToTable("tMcoachDivingLevel");
+
+            entity.Property(e => e.DivingLevelId).HasColumnName("divingLevelId");
+            entity.Property(e => e.CoachId).HasColumnName("coachId");
+            entity.Property(e => e.LevelId).HasColumnName("levelId");
+
+            entity.HasOne(d => d.Coach).WithMany(p => p.TMcoachDivingLevels)
+                .HasForeignKey(d => d.CoachId)
+                .HasConstraintName("FK_tMcoachDivingLevel_tMcoaches");
+
+            entity.HasOne(d => d.Level).WithMany(p => p.TMcoachDivingLevels)
+                .HasForeignKey(d => d.LevelId)
+                .HasConstraintName("FK_tMcoachDivingLevel_tMdivingLevel");
+        });
+
+        modelBuilder.Entity<TMdivingLevel>(entity =>
+        {
+            entity.HasKey(e => e.LevelId).HasName("PK_divingLevel");
+
+            entity.ToTable("tMdivingLevel");
+
+            entity.Property(e => e.LevelId).HasColumnName("levelId");
+            entity.Property(e => e.LevelNameId).HasColumnName("levelNameId");
+            entity.Property(e => e.LevelType)
+                .HasMaxLength(50)
+                .HasColumnName("levelType");
+
+            entity.HasOne(d => d.LevelName).WithMany(p => p.TMdivingLevels)
+                .HasForeignKey(d => d.LevelNameId)
+                .HasConstraintName("FK_tMdivingLevel_tMdivingLevelName");
+        });
+
+        modelBuilder.Entity<TMdivingLevelName>(entity =>
+        {
+            entity.HasKey(e => e.LevelNameId).HasName("PK_divingLevelName");
+
+            entity.ToTable("tMdivingLevelName");
+
+            entity.Property(e => e.LevelNameId).HasColumnName("levelNameId");
+            entity.Property(e => e.LevelTypeName)
+                .HasMaxLength(50)
+                .HasColumnName("levelTypeName");
+        });
+
+        modelBuilder.Entity<TMdivingStyle>(entity =>
+        {
+            entity.HasKey(e => e.DivingStyleId).HasName("PK_divingStyle");
+
+            entity.ToTable("tMdivingStyle");
+
+            entity.Property(e => e.DivingStyleId).HasColumnName("divingStyleId");
+            entity.Property(e => e.DivingStyle)
+                .HasMaxLength(50)
+                .HasColumnName("divingStyle");
+        });
+
+        modelBuilder.Entity<TMfavoriteList>(entity =>
+        {
+            entity.HasKey(e => e.FavoriteId).HasName("PK_favoriteList");
+
+            entity.ToTable("tMfavoriteList");
+
+            entity.Property(e => e.FavoriteId).HasColumnName("favoriteId");
+            entity.Property(e => e.CreateDate).HasColumnName("createDate");
+            entity.Property(e => e.FavoriteItem).HasColumnName("favoriteItem");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TMfavoriteLists)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tMfavoriteList_tMmemberList");
+        });
+
+        modelBuilder.Entity<TMmemberDivingLevel>(entity =>
+        {
+            entity.HasKey(e => e.DivingLevelId).HasName("PK_memberDivingLevel");
+
+            entity.ToTable("tMmemberDivingLevel");
+
+            entity.Property(e => e.LevelId).HasColumnName("levelId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+
+            entity.HasOne(d => d.Level).WithMany(p => p.TMmemberDivingLevels)
+                .HasForeignKey(d => d.LevelId)
+                .HasConstraintName("FK_tMmemberDivingLevel_tMdivingLevel");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TMmemberDivingLevels)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tMmemberDivingLevel_tMmemberList");
+        });
+
+        modelBuilder.Entity<TMmemberList>(entity =>
+        {
+            entity.HasKey(e => e.MemberId).HasName("PK_memberList");
+
+            entity.ToTable("tMmemberList");
+
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.MemberAddress)
+                .HasMaxLength(60)
+                .HasColumnName("memberAddress");
+            entity.Property(e => e.MemberEmail)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("memberEmail");
+            entity.Property(e => e.MemberGender)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("memberGender");
+            entity.Property(e => e.MemberName)
+                .HasMaxLength(50)
+                .HasColumnName("memberName");
+            entity.Property(e => e.MemberPassword)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("memberPassword");
+            entity.Property(e => e.MemberPhone)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("memberPhone");
+            entity.Property(e => e.MemberPhoto).HasColumnName("memberPhoto");
+            entity.Property(e => e.RecentLogin)
+                .HasColumnType("datetime")
+                .HasColumnName("recentLogin");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.ThirdPartyId)
+                .HasMaxLength(255)
+                .HasColumnName("thirdPartyId");
+            entity.Property(e => e.ThirdPartyProvider)
+                .HasMaxLength(50)
+                .HasColumnName("thirdPartyProvider");
+            entity.Property(e => e.UrgentContact)
+                .HasMaxLength(50)
+                .HasColumnName("urgentContact");
+            entity.Property(e => e.UrgentPhone)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("urgentPhone");
+        });
+
+        modelBuilder.Entity<TNcart>(entity =>
+        {
+            entity.HasKey(e => e.CartId).HasName("PK_tNCart");
+
+            entity.ToTable("tNcart");
+
+            entity.Property(e => e.CartId).HasColumnName("cartId");
+            entity.Property(e => e.CreationDate)
+                .HasColumnType("datetime")
+                .HasColumnName("creationDate");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.UpdatedDate)
+                .HasColumnType("datetime")
+                .HasColumnName("updatedDate");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TNcarts)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tNcart_tMmemberList");
+        });
+
+        modelBuilder.Entity<TNcartItem>(entity =>
+        {
+            entity.HasKey(e => e.CartitemId);
+
+            entity.ToTable("tNcartItem");
+
+            entity.Property(e => e.CartitemId)
+                .ValueGeneratedNever()
+                .HasColumnName("cartitemId");
+            entity.Property(e => e.CartId).HasColumnName("cartId");
+            entity.Property(e => e.Condition)
+                .HasMaxLength(50)
+                .HasColumnName("condition");
+            entity.Property(e => e.CreationDate)
+                .HasColumnType("datetime")
+                .HasColumnName("creationDate");
+            entity.Property(e => e.IsLocked).HasColumnName("is_locked");
+            entity.Property(e => e.ProductvariantsId).HasColumnName("productvariantsId");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.UnitpriceatCart)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("unitpriceatCart");
+            entity.Property(e => e.UpdatedDate)
+                .HasColumnType("datetime")
+                .HasColumnName("updatedDate");
+            entity.Property(e => e.UproductId).HasColumnName("uproductId");
+
+            entity.HasOne(d => d.Cart).WithMany(p => p.TNcartItems)
+                .HasForeignKey(d => d.CartId)
+                .HasConstraintName("FK_tNcartItem_tNcart");
+
+            entity.HasOne(d => d.Productvariants).WithMany(p => p.TNcartItems)
+                .HasForeignKey(d => d.ProductvariantsId)
+                .HasConstraintName("FK_tNcartItem_tNproductvariants");
+
+            entity.HasOne(d => d.Uproduct).WithMany(p => p.TNcartItems)
+                .HasForeignKey(d => d.UproductId)
+                .HasConstraintName("FK_tNcartItem_tUproducts");
+        });
+
+        modelBuilder.Entity<TNcolor>(entity =>
+        {
+            entity.HasKey(e => e.ColorId);
+
+            entity.ToTable("tNcolor");
+
+            entity.Property(e => e.ColorId).HasColumnName("colorId");
+            entity.Property(e => e.Color)
+                .HasMaxLength(50)
+                .HasColumnName("color");
+        });
+
+        modelBuilder.Entity<TNdiscount>(entity =>
+        {
+            entity.HasKey(e => e.DiscountId);
+
+            entity.ToTable("tNdiscount");
+
+            entity.Property(e => e.DiscountId).HasColumnName("discountId");
+            entity.Property(e => e.DiscountName)
+                .HasMaxLength(50)
+                .HasColumnName("discountName");
+            entity.Property(e => e.DiscountValue)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("discountValue");
+            entity.Property(e => e.EndDate)
+                .HasColumnType("datetime")
+                .HasColumnName("endDate");
+            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
+            entity.Property(e => e.StartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("startDate");
+        });
+
+        modelBuilder.Entity<TNgender>(entity =>
+        {
+            entity.HasKey(e => e.GenderId);
+
+            entity.ToTable("tNgender");
+
+            entity.Property(e => e.GenderId).HasColumnName("genderId");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(50)
+                .HasColumnName("gender");
+        });
+
+        modelBuilder.Entity<TNorder>(entity =>
+        {
+            entity.HasKey(e => e.OrderId);
+
+            entity.ToTable("tNorder");
+
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.CreatedDate)
+                .HasColumnType("datetime")
+                .HasColumnName("createdDate");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderStatus)
+                .HasMaxLength(50)
+                .HasColumnName("orderStatus");
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .HasColumnName("paymentMethod");
+            entity.Property(e => e.ShipAddress)
+                .HasMaxLength(50)
+                .HasColumnName("shipAddress");
+            entity.Property(e => e.ShipPhone)
+                .HasMaxLength(50)
+                .HasColumnName("shipPhone");
+            entity.Property(e => e.TotalAmount)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("totalAmount");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TNorders)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tNorder_tMmemberList");
+        });
+
+        modelBuilder.Entity<TNorderDetail>(entity =>
+        {
+            entity.HasKey(e => e.OrderDetailsId);
+
+            entity.ToTable("tNorderDetail");
+
+            entity.Property(e => e.OrderDetailsId).HasColumnName("orderDetailsId");
+            entity.Property(e => e.DiscountAmount)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("discountAmount");
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.ProductvariantsId).HasColumnName("productvariantsId");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.Subtotal).HasColumnName("subtotal");
+            entity.Property(e => e.UnitPriceAtOrder)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("unitPriceAtOrder");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.TNorderDetails)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK_tNorderDetail_tNorder");
+
+            entity.HasOne(d => d.Productvariants).WithMany(p => p.TNorderDetails)
+                .HasForeignKey(d => d.ProductvariantsId)
+                .HasConstraintName("FK_tNorderDetail_tNproductvariants");
+
+            entity.HasOne(d => d.SubtotalNavigation).WithMany(p => p.TNorderDetails)
+                .HasForeignKey(d => d.Subtotal)
+                .HasConstraintName("FK_tNorderDetail_tNdiscount");
+        });
+
+        modelBuilder.Entity<TNpicture>(entity =>
+        {
+            entity.HasKey(e => e.PictureId).HasName("PK_tpicture");
+
+            entity.ToTable("tNpicture");
+
+            entity.Property(e => e.PictureId).HasColumnName("pictureId");
+            entity.Property(e => e.Image).HasColumnName("image");
+            entity.Property(e => e.IsMain).HasColumnName("isMain");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.TNpictures)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK_tNpicture_tNproduct");
+        });
+
+        modelBuilder.Entity<TNproduct>(entity =>
+        {
+            entity.HasKey(e => e.ProductId);
+
+            entity.ToTable("tNproduct");
+
+            entity.Property(e => e.ProductId).HasColumnName("productId");
+            entity.Property(e => e.Description)
+                .HasMaxLength(50)
+                .HasColumnName("description");
+            entity.Property(e => e.ProductName)
+                .HasMaxLength(50)
+                .HasColumnName("productName");
+            entity.Property(e => e.UnitCost)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("unitCost");
+            entity.Property(e => e.UnitPrice)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("unitPrice");
+        });
+
+        modelBuilder.Entity<TNproductCategory>(entity =>
+        {
+            entity.HasKey(e => e.ProductCategoryId);
+
+            entity.ToTable("tNproductCategory");
+
+            entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
+            entity.Property(e => e.CategoryName)
+                .HasMaxLength(50)
+                .HasColumnName("categoryName");
+            entity.Property(e => e.ParentCategoryId).HasColumnName("parentCategoryId");
+        });
+
+        modelBuilder.Entity<TNproductcategoryMapping>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("tNproductcategoryMapping");
+
+            entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
+
+            entity.HasOne(d => d.ProductCategory).WithMany()
+                .HasForeignKey(d => d.ProductCategoryId)
+                .HasConstraintName("FK_tNproductcategoryMapping_tNproductCategory");
+
+            entity.HasOne(d => d.Product).WithMany()
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK_tNproductcategoryMapping_tNproduct");
+        });
+
+        modelBuilder.Entity<TNproductvariant>(entity =>
+        {
+            entity.HasKey(e => e.ProductvariantsId);
+
+            entity.ToTable("tNproductvariants");
+
+            entity.Property(e => e.ProductvariantsId).HasColumnName("productvariantsId");
+            entity.Property(e => e.ColorId).HasColumnName("colorId");
+            entity.Property(e => e.GenderId).HasColumnName("genderId");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
+            entity.Property(e => e.SizeId).HasColumnName("sizeId");
+            entity.Property(e => e.Stock).HasColumnName("stock");
+            entity.Property(e => e.ThicknessId).HasColumnName("thicknessId");
+
+            entity.HasOne(d => d.Color).WithMany(p => p.TNproductvariants)
+                .HasForeignKey(d => d.ColorId)
+                .HasConstraintName("FK_tNproductvariants_tNcolor");
+
+            entity.HasOne(d => d.Gender).WithMany(p => p.TNproductvariants)
+                .HasForeignKey(d => d.GenderId)
+                .HasConstraintName("FK_tNproductvariants_tNgender");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.TNproductvariants)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK_tNproductvariants_tNproduct");
+
+            entity.HasOne(d => d.Size).WithMany(p => p.TNproductvariants)
+                .HasForeignKey(d => d.SizeId)
+                .HasConstraintName("FK_tNproductvariants_tNsize");
+
+            entity.HasOne(d => d.Thickness).WithMany(p => p.TNproductvariants)
+                .HasForeignKey(d => d.ThicknessId)
+                .HasConstraintName("FK_tNproductvariants_tNthickness");
+        });
+
+        modelBuilder.Entity<TNreview>(entity =>
+        {
+            entity.HasKey(e => e.ReviewId);
+
+            entity.ToTable("tNreview");
+
+            entity.Property(e => e.ReviewId).HasColumnName("reviewId");
+            entity.Property(e => e.CreatedDate)
+                .HasColumnType("datetime")
+                .HasColumnName("createdDate");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderDetailsId).HasColumnName("orderDetailsId");
+            entity.Property(e => e.ReviewContent).HasColumnName("reviewContent");
+            entity.Property(e => e.ReviewRating).HasColumnName("reviewRating");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TNreviews)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tNreview_tMmemberList");
+
+            entity.HasOne(d => d.OrderDetails).WithMany(p => p.TNreviews)
+                .HasForeignKey(d => d.OrderDetailsId)
+                .HasConstraintName("FK_tNreview_tNorderDetail");
+        });
+
+        modelBuilder.Entity<TNsize>(entity =>
+        {
+            entity.HasKey(e => e.SizeId);
+
+            entity.ToTable("tNsize");
+
+            entity.Property(e => e.SizeId).HasColumnName("sizeId");
+            entity.Property(e => e.Size)
+                .HasMaxLength(50)
+                .HasColumnName("size");
+        });
+
+        modelBuilder.Entity<TNthickness>(entity =>
+        {
+            entity.HasKey(e => e.ThicknessId);
+
+            entity.ToTable("tNthickness");
+
+            entity.Property(e => e.ThicknessId).HasColumnName("thicknessId");
+            entity.Property(e => e.Thickness)
+                .HasMaxLength(50)
+                .HasColumnName("thickness");
+        });
+
+        modelBuilder.Entity<TScollect>(entity =>
+        {
+            entity.HasKey(e => e.CollectId);
+
+            entity.ToTable("tScollect");
+
+            entity.Property(e => e.CollectId).HasColumnName("collectId");
+        });
+
+        modelBuilder.Entity<TSevaluate>(entity =>
+        {
+            entity.HasKey(e => e.EvaluateId);
+
+            entity.ToTable("tSevaluate");
+
+            entity.Property(e => e.EvaluateId).HasColumnName("evaluateId");
+            entity.Property(e => e.EvaluateIdDetail)
+                .HasMaxLength(50)
+                .HasColumnName("evaluateIdDetail");
+        });
+
+        modelBuilder.Entity<TSorder>(entity =>
+        {
+            entity.HasKey(e => e.OrderId);
+
+            entity.ToTable("tSorder");
+
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.SiteId).HasColumnName("siteId");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TSorders)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tSorder_tMmemberList");
+
+            entity.HasOne(d => d.Site).WithMany(p => p.TSorders)
+                .HasForeignKey(d => d.SiteId)
+                .HasConstraintName("FK_tSorder_tSsiteDetail");
+        });
+
+        modelBuilder.Entity<TSorderDetail>(entity =>
+        {
+            entity.HasKey(e => e.OrderDetailId);
+
+            entity.ToTable("tSorderDetail");
+
+            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
+            entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.ScheduleId)
+                .HasMaxLength(50)
+                .HasColumnName("scheduleId");
+            entity.Property(e => e.UnitPrice)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("unitPrice");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.TSorderDetails)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK_tSorderDetail_tSorder");
+        });
+
+        modelBuilder.Entity<TSphoto>(entity =>
+        {
+            entity.HasKey(e => e.PhotoId);
+
+            entity.ToTable("tSphoto");
+
+            entity.Property(e => e.PhotoId).HasColumnName("photoId");
+            entity.Property(e => e.Photo1).HasColumnName("photo1");
+            entity.Property(e => e.Photo2).HasColumnName("photo2");
+            entity.Property(e => e.Photo3).HasColumnName("photo3");
+            entity.Property(e => e.SiteId).HasColumnName("siteId");
+
+            entity.HasOne(d => d.Site).WithMany(p => p.TSphotos)
+                .HasForeignKey(d => d.SiteId)
+                .HasConstraintName("FK_tSphoto_tSsiteDetail");
+        });
+
+        modelBuilder.Entity<TSshoppingCart>(entity =>
+        {
+            entity.HasKey(e => e.CartId);
+
+            entity.ToTable("tSshoppingCart");
+
+            entity.Property(e => e.CartId).HasColumnName("cartId");
+            entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.ScheduleId)
+                .HasMaxLength(50)
+                .HasColumnName("scheduleId");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TSshoppingCarts)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tSshoppingCart_tMmemberList");
+        });
+
+        modelBuilder.Entity<TSsiteDetail>(entity =>
+        {
+            entity.HasKey(e => e.SiteId);
+
+            entity.ToTable("tSsiteDetail");
+
+            entity.Property(e => e.SiteId).HasColumnName("siteId");
+            entity.Property(e => e.Collect).HasColumnName("collect");
+            entity.Property(e => e.Detail).HasColumnName("detail");
+            entity.Property(e => e.Evaluate).HasColumnName("evaluate");
+            entity.Property(e => e.NumberOfPeople).HasColumnName("numberOfPeople");
+            entity.Property(e => e.Photo).HasColumnName("photo");
+            entity.Property(e => e.VenueAddress)
+                .HasMaxLength(50)
+                .HasColumnName("venueAddress");
+            entity.Property(e => e.VenueName)
+                .HasMaxLength(50)
+                .HasColumnName("venueName");
+        });
+
+        modelBuilder.Entity<TUcategory>(entity =>
+        {
+            entity.HasKey(e => e.CategoryId).HasName("PK__tUcatego__23CAF1D89E5E9277");
+
+            entity.ToTable("tUcategories");
+
+            entity.Property(e => e.CategoryId).HasColumnName("categoryId");
+            entity.Property(e => e.CategoryName)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("categoryName");
+        });
+
+        modelBuilder.Entity<TUorder>(entity =>
+        {
+            entity.HasKey(e => e.OrderId).HasName("PK__tUorders__0809335D281CA9AB");
+
+            entity.ToTable("tUorders");
+
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderDate)
+                .HasColumnType("datetime")
+                .HasColumnName("orderDate");
+            entity.Property(e => e.OrderLogId).HasColumnName("orderLogId");
+            entity.Property(e => e.OrderStatusId).HasColumnName("orderStatusId");
+
+            entity.HasOne(d => d.Member).WithMany(p => p.TUorders)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tUorders_tMmemberList");
+        });
+
+        modelBuilder.Entity<TUorderDetail>(entity =>
+        {
+            entity.HasKey(e => e.OrderDetailsId).HasName("PK__tUorderD__5EEE52739FF6D236");
+
+            entity.ToTable("tUorderDetails");
+
+            entity.Property(e => e.OrderDetailsId).HasColumnName("orderDetailsId");
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.UnitPrice)
+                .HasColumnType("money")
+                .HasColumnName("unitPrice");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.TUorderDetails)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK_tUorderDetails_tUorders");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.TUorderDetails)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK_tUorderDetails_tUproducts");
+        });
+
+        modelBuilder.Entity<TUorderLog>(entity =>
+        {
+            entity.HasKey(e => e.OrderLogId).HasName("PK__tUorderL__DE6E4BB365BDB0E6");
+
+            entity.ToTable("tUorderLog");
+
+            entity.Property(e => e.OrderLogId).HasColumnName("orderLogId");
+            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.OrderStatusId).HasColumnName("orderStatusId");
+            entity.Property(e => e.Remarks)
+                .HasMaxLength(200)
+                .HasColumnName("remarks");
+            entity.Property(e => e.StatusDate)
+                .HasColumnType("datetime")
+                .HasColumnName("statusDate");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.TUorderLogs)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK__tUorderLo__order__72C60C4A");
+
+            entity.HasOne(d => d.OrderStatus).WithMany(p => p.TUorderLogs)
+                .HasForeignKey(d => d.OrderStatusId)
+                .HasConstraintName("FK__tUorderLo__order__73BA3083");
+        });
+
+        modelBuilder.Entity<TUorderStatusId>(entity =>
+        {
+            entity.HasKey(e => e.OrderStatusId).HasName("PK__tUorderS__C0F253693176FED7");
+
+            entity.ToTable("tUorderStatusId");
+
+            entity.Property(e => e.OrderStatusId).HasColumnName("orderStatusId");
+            entity.Property(e => e.PaymentStatus)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("paymentStatus");
+        });
+
+        modelBuilder.Entity<TUproduct>(entity =>
+        {
+            entity.HasKey(e => e.UproductId);
+
+            entity.ToTable("tUproducts");
+
+            entity.Property(e => e.UproductId).HasColumnName("uproductId");
+            entity.Property(e => e.CategoryId).HasColumnName("categoryId");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.ProductConditionId).HasColumnName("productConditionId");
+            entity.Property(e => e.ProductDescription)
+                .HasMaxLength(200)
+                .HasColumnName("productDescription");
+            entity.Property(e => e.ProductName)
+                .HasMaxLength(40)
+                .HasColumnName("productName");
+            entity.Property(e => e.ProductPrice)
+                .HasColumnType("money")
+                .HasColumnName("productPrice");
+            entity.Property(e => e.ProductStatus).HasColumnName("productStatus");
+            entity.Property(e => e.SellerId).HasColumnName("sellerId");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("updatedAt");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.TUproducts)
+                .HasForeignKey(d => d.CategoryId)
+                .HasConstraintName("FK_tUproducts_tUcategories");
+
+            entity.HasOne(d => d.ProductCondition).WithMany(p => p.TUproducts)
+                .HasForeignKey(d => d.ProductConditionId)
+                .HasConstraintName("FK_tUproducts_tUproductCondition");
+
+            entity.HasOne(d => d.Seller).WithMany(p => p.TUproducts)
+                .HasForeignKey(d => d.SellerId)
+                .HasConstraintName("FK_tUproducts_tMmemberList");
+        });
+
+        modelBuilder.Entity<TUproductCondition>(entity =>
+        {
+            entity.HasKey(e => e.ProductConditionId).HasName("PK__tUproduc__5741C79378A47D07");
+
+            entity.ToTable("tUproductCondition");
+
+            entity.Property(e => e.ProductConditionId).HasColumnName("productConditionId");
+            entity.Property(e => e.Condition)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("condition");
+        });
+
+        modelBuilder.Entity<TUproductImage>(entity =>
+        {
+            entity.HasKey(e => e.ProductImagesId).HasName("PK__tUproduc__B254FEE088910DF1");
+
+            entity.ToTable("tUproductImages");
+
+            entity.Property(e => e.ProductImagesId).HasColumnName("productImagesId");
+            entity.Property(e => e.Uimage).HasColumnName("uimage");
+            entity.Property(e => e.UproductId).HasColumnName("uproductId");
+
+            entity.HasOne(d => d.Uproduct).WithMany(p => p.TUproductImages)
+                .HasForeignKey(d => d.UproductId)
+                .HasConstraintName("FK_tUproductImages_tUproducts");
+        });
+
+        modelBuilder.Entity<TUreview>(entity =>
+        {
+            entity.HasKey(e => e.ReviewId).HasName("PK__tUreview__2ECD6E04B30D83A9");
+
+            entity.ToTable("tUreviews");
+
+            entity.Property(e => e.ReviewId).HasColumnName("reviewId");
+            entity.Property(e => e.BuyerId).HasColumnName("buyerId");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("createdAt");
+            entity.Property(e => e.OrderDetailsId).HasColumnName("orderDetailsId");
+            entity.Property(e => e.ReviewComment)
+                .HasMaxLength(40)
+                .HasColumnName("reviewComment");
+            entity.Property(e => e.ReviewDate)
+                .HasColumnType("datetime")
+                .HasColumnName("reviewDate");
+            entity.Property(e => e.ReviewRating).HasColumnName("reviewRating");
+            entity.Property(e => e.SellerId).HasColumnName("sellerId");
+
+            entity.HasOne(d => d.OrderDetails).WithMany(p => p.TUreviews)
+                .HasForeignKey(d => d.OrderDetailsId)
+                .HasConstraintName("FK_tUreviews_tUorderDetails");
+        });
+
+        modelBuilder.Entity<VwCourseDetail>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("vw_CourseDetails");
+
+            entity.Property(e => e.價格).HasColumnType("money");
+            entity.Property(e => e.圖片).HasColumnType("image");
+            entity.Property(e => e.建立時間).HasColumnType("datetime");
+            entity.Property(e => e.教練).HasMaxLength(50);
+            entity.Property(e => e.更新時間).HasColumnType("datetime");
+            entity.Property(e => e.等級).HasMaxLength(50);
+            entity.Property(e => e.課程).HasMaxLength(50);
+            entity.Property(e => e.課程id).HasColumnName("課程ID");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}
