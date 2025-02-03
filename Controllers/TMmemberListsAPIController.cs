@@ -29,18 +29,47 @@ namespace diveWebAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            var user = await _context.TMmemberLists.FirstOrDefaultAsync(u => u.MemberEmail == loginRequest.Email);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.MemberPassword))
+            var userData = await _context.TMmemberLists
+                .Where(u => u.MemberEmail == loginRequest.Email)
+                .Select(u => new{
+                    u.MemberId,
+                    u.MemberEmail,
+                    u.MemberName,
+                    u.MemberPassword,
+                    u.RecentLogin
+                }).FirstOrDefaultAsync();
+
+            if (userData == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, userData.MemberPassword))
             {
                 return Unauthorized(new { status = false, message = "帳號或密碼錯誤" });
             }
-            user.RecentLogin = DateTime.UtcNow;
-            _context.Entry(user).State = EntityState.Modified;
+
+            var user = new TMmemberList
+            {
+                MemberId = userData.MemberId,
+                MemberEmail = userData.MemberEmail,
+                MemberName = userData.MemberName,
+                MemberPassword = userData.MemberPassword,
+                RecentLogin = DateTime.UtcNow 
+            };
+
+            _context.TMmemberLists.Update(user);
             await _context.SaveChangesAsync();
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new { status = true, message = "登入成功", token = token, user = new { user.MemberId, user.MemberEmail } });
+            return Ok(new
+            {
+                status = true,
+                message = "登入成功",
+                token = token,
+                user = new
+                {
+                    user.MemberId,
+                    user.MemberEmail,
+                    MemberName = user.MemberName ?? "您"
+                }
+            });
         }
         private string GenerateJwtToken(TMmemberList user)
         {
@@ -58,7 +87,7 @@ namespace diveWebAPI.Controllers
                 issuer: "diveShopper", // 發行者
                 audience: "diveShopperClient", // 受眾
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(24), // Token 有效期
+                expires: DateTime.UtcNow.AddHours(1), // Token 有效期
                 signingCredentials: creds
             );
 
@@ -103,7 +132,7 @@ namespace diveWebAPI.Controllers
         [HttpGet("profile")]
         public IActionResult GetUserProfile()
         {
-            Console.WriteLine("進入 GetUserProfile 方法"); 
+            Console.WriteLine("進入 GetUserProfile 方法");
 
             // 檢查 Token 是否解析出 User.Claims
             var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
