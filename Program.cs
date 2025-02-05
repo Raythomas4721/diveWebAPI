@@ -1,10 +1,12 @@
 using diveWebAPI.Data;
 using diveWebAPI.Models;
+using diveWebAPI.Partial;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DiveShopperContext = diveWebAPI.Models.DiveShopperContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<DiveShopperContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("diveShopper"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DiveShopper"));
 });
 
 // CORS 設定
@@ -28,7 +30,6 @@ builder.Services.AddCors(options =>
 });
 
 
-// 只讓 Razor Pages 使用 Identity，API 仍然只使用 JWT
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;

@@ -130,23 +130,48 @@ namespace diveWebAPI.Controllers
         }
         [Authorize]
         [HttpGet("profile")]
-        public IActionResult GetUserProfile()
+        public async Task<IActionResult> GetUserProfile()
         {
-            Console.WriteLine("進入 GetUserProfile 方法");
-
-            // 檢查 Token 是否解析出 User.Claims
+            // 確保 Token 內有 Claims
             var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
-            Console.WriteLine($"Claims: {string.Join(", ", claims.Select(c => $"{c.Type}: {c.Value}"))}");
 
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             if (userId == null)
             {
-                Console.WriteLine("無效的 Token，userId 為空");
-                return Unauthorized(new { message = "無效的 Token" });
+                return Unauthorized(new { message = "無效的 Token，userId 不存在" });
             }
 
-            return Ok(new { userId, message = "成功獲取用戶資訊" });
+            if (!int.TryParse(userId, out int parsedUserId))
+            {
+                return BadRequest(new { message = "userId 參數無效，應該是數字類型" });
+            }
+
+            var user = await _context.TMmemberLists.FindAsync(parsedUserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "找不到該使用者" });
+            }
+
+            return Ok(new
+            {
+                userId = parsedUserId,
+                message = "成功獲取用戶資訊",
+                user
+            });
         }
+
+        [HttpGet("GetUserPhoto/{userId}")]
+        public async Task<IActionResult> GetUserPhoto(int userId)
+        {
+            var user = await _context.TMmemberLists.FindAsync(userId);
+            if (user == null || user.MemberPhoto == null)
+            {
+                return NotFound(); 
+            }
+
+            return File(user.MemberPhoto, "image/png"); 
+        }
+
         // GET: api/TMmemberListsAPI
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TMmemberList>>> GetTMmemberLists()
