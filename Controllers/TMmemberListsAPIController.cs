@@ -13,6 +13,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using Azure.Core;
 
 namespace diveWebAPI.Controllers
 {
@@ -31,7 +34,8 @@ namespace diveWebAPI.Controllers
         {
             var userData = await _context.TMmemberLists
                 .Where(u => u.MemberEmail == loginRequest.Email)
-                .Select(u => new{
+                .Select(u => new
+                {
                     u.MemberId,
                     u.MemberEmail,
                     u.MemberName,
@@ -44,17 +48,13 @@ namespace diveWebAPI.Controllers
                 return Unauthorized(new { status = false, message = "帳號或密碼錯誤" });
             }
 
-            var user = new TMmemberList
+            var user = await _context.TMmemberLists.FirstOrDefaultAsync(u => u.MemberEmail == loginRequest.Email);
+            if (user != null)
             {
-                MemberId = userData.MemberId,
-                MemberEmail = userData.MemberEmail,
-                MemberName = userData.MemberName,
-                MemberPassword = userData.MemberPassword,
-                RecentLogin = DateTime.UtcNow 
-            };
-
-            _context.TMmemberLists.Update(user);
-            await _context.SaveChangesAsync();
+                user.RecentLogin = DateTime.UtcNow;
+                _context.TMmemberLists.Update(user);
+                await _context.SaveChangesAsync();
+            }
 
             var token = GenerateJwtToken(user);
 
@@ -62,13 +62,7 @@ namespace diveWebAPI.Controllers
             {
                 status = true,
                 message = "登入成功",
-                token = token,
-                user = new
-                {
-                    user.MemberId,
-                    user.MemberEmail,
-                    MemberName = user.MemberName ?? "您"
-                }
+                token = token
             });
         }
         private string GenerateJwtToken(TMmemberList user)
@@ -80,14 +74,15 @@ namespace diveWebAPI.Controllers
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.MemberEmail),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("userId", user.MemberId.ToString())
+                new Claim("userId", user.MemberId.ToString()),
+                new Claim("name", user.MemberName)
             };
 
             var token = new JwtSecurityToken(
                 issuer: "diveShopper", // 發行者
                 audience: "diveShopperClient", // 受眾
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1), // Token 有效期
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: creds
             );
 
@@ -101,6 +96,7 @@ namespace diveWebAPI.Controllers
 
         public class RegisterRequest
         {
+            public string Name { get; set; }
             public string Email { get; set; }
             public string Password { get; set; }
         }
@@ -117,6 +113,7 @@ namespace diveWebAPI.Controllers
 
             var newUser = new TMmemberList
             {
+                MemberName = request.Name,
                 MemberEmail = request.Email,
                 MemberPassword = hashedPassword,
                 RecentLogin = DateTime.UtcNow,
@@ -132,18 +129,10 @@ namespace diveWebAPI.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetUserProfile()
         {
-            // 確保 Token 內有 Claims
-            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
-
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userId == null)
+            if (userId == null || !int.TryParse(userId, out int parsedUserId))
             {
                 return Unauthorized(new { message = "無效的 Token，userId 不存在" });
-            }
-
-            if (!int.TryParse(userId, out int parsedUserId))
-            {
-                return BadRequest(new { message = "userId 參數無效，應該是數字類型" });
             }
 
             var user = await _context.TMmemberLists.FindAsync(parsedUserId);
@@ -152,6 +141,8 @@ namespace diveWebAPI.Controllers
                 return NotFound(new { message = "找不到該使用者" });
             }
 
+            string? base64Photo = user.MemberPhoto != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(user.MemberPhoto)}" : null;
+
             return Ok(new
             {
                 userId = parsedUserId,
@@ -159,97 +150,175 @@ namespace diveWebAPI.Controllers
                 user
             });
         }
-
-        [HttpGet("GetUserPhoto/{userId}")]
-        public async Task<IActionResult> GetUserPhoto(int userId)
+        public class EditUserInfo
         {
-            var user = await _context.TMmemberLists.FindAsync(userId);
-            if (user == null || user.MemberPhoto == null)
+            public string? MemberName { get; set; }
+            public string? MemberPhone { get; set; }
+            public string? MemberAddress { get; set; }
+            public string? UrgentContact { get; set; }
+            public string? UrgentPhone { get; set; }
+
+        }
+        [Authorize]
+        [HttpPut("UpdateUserInfo")]
+        public async Task<IActionResult> UpdateUserInfo([FromBody] EditUserInfo request)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (!int.TryParse(userId, out int parsedUserId))
             {
-                return NotFound(); 
+                return Unauthorized(new { message = "無效的 Token，userId 不存在" });
+            }
+            var user = await _context.TMmemberLists.FindAsync(parsedUserId);
+            if (user == null)
+            {
+                return NotFound(new { Message = "找不到該使用者" });
             }
 
-            return File(user.MemberPhoto, "image/png"); 
-        }
+            user.MemberName = request.MemberName;
+            user.MemberPhone = request.MemberPhone;
+            user.MemberAddress = request.MemberAddress;
+            user.UrgentContact = request.UrgentContact;
+            user.UrgentPhone = request.UrgentPhone;
+            user.Status = true;
 
-        // GET: api/TMmemberListsAPI
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TMmemberList>>> GetTMmemberLists()
-        {
-            return await _context.TMmemberLists.ToListAsync();
-        }
-
-        // GET: api/TMmemberListsAPI/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TMmemberList>> GetTMmemberList(int id)
-        {
-            var tMmemberList = await _context.TMmemberLists.FindAsync(id);
-
-            if (tMmemberList == null)
-            {
-                return NotFound();
-            }
-
-            return tMmemberList;
-        }
-
-        // PUT: api/TMmemberListsAPI/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTMmemberList(int id, TMmemberList tMmemberList)
-        {
-            if (id != tMmemberList.MemberId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(tMmemberList).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // 儲存變更
+                return Ok(new { status = true, message = "使用者資訊變更成功" });
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!TMmemberListExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+                return StatusCode(500, new { status = false, message = "更新使用者資訊時發生錯誤", error = ex.Message });
+            };
         }
 
-        // POST: api/TMmemberListsAPI
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<TMmemberList>> PostTMmemberList(TMmemberList tMmemberList)
-        {
-            _context.TMmemberLists.Add(tMmemberList);
-            await _context.SaveChangesAsync();
+        //[HttpPatch("ChangeUserPhoto")]
+        //[Consumes("multipart/form-data")] 
+        //public async Task<IActionResult> ChangeUserPhoto([FromForm] IFormFile photo)
+        //{
+        //    var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+        //    if (userId == null || !int.TryParse(userId, out int parsedUserId))
+        //    {
+        //        return Unauthorized(new { message = "無效的 Token，userId 不存在" });
+        //    }
 
-            return CreatedAtAction("GetTMmemberList", new { id = tMmemberList.MemberId }, tMmemberList);
-        }
+        //    var user = await _context.TMmemberLists.FindAsync(parsedUserId);
+        //    if (user == null)
+        //    {
+        //        return NotFound(new { message = "找不到該使用者，請確認 userId 是否有效" });
+        //    }
 
-        // DELETE: api/TMmemberListsAPI/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTMmemberList(int id)
-        {
-            var tMmemberList = await _context.TMmemberLists.FindAsync(id);
-            if (tMmemberList == null)
-            {
-                return NotFound();
-            }
+        //    if (photo == null || photo.Length == 0)
+        //    {
+        //        return BadRequest(new { message = "未提供圖片" });
+        //    }
 
-            _context.TMmemberLists.Remove(tMmemberList);
-            await _context.SaveChangesAsync();
+        //    try
+        //    {
+        //        using (var memoryStream = new MemoryStream())
+        //        {
+        //            await photo.CopyToAsync(memoryStream);
+        //            user.MemberPhoto = memoryStream.ToArray(); // 只修改 photo
+        //        }
 
-            return NoContent();
-        }
+        //        await _context.SaveChangesAsync();
+
+        //        string contentType = string.IsNullOrEmpty(photo.ContentType) ? "image/jpeg" : photo.ContentType;
+        //        string base64Photo = $"data:{contentType};base64,{Convert.ToBase64String(user.MemberPhoto)}";
+
+        //        return Ok(new { status = true, message = "圖片上傳成功", memberPhoto = base64Photo });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { status = false, message = "圖片上傳失敗", error = ex.Message });
+        //    }
+        //}
+
+
+
+
+
+
+
+        // GET: api/TMmemberListsAPI
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<TMmemberList>>> GetTMmemberLists()
+        //{
+        //    return await _context.TMmemberLists.ToListAsync();
+        //}
+
+        //// GET: api/TMmemberListsAPI/5
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<TMmemberList>> GetTMmemberList(int id)
+        //{
+        //    var tMmemberList = await _context.TMmemberLists.FindAsync(id);
+
+        //    if (tMmemberList == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return tMmemberList;
+        //}
+
+        //// PUT: api/TMmemberListsAPI/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutTMmemberList(int id, TMmemberList tMmemberList)
+        //{
+        //    if (id != tMmemberList.MemberId)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(tMmemberList).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!TMmemberListExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
+        //// POST: api/TMmemberListsAPI
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<TMmemberList>> PostTMmemberList(TMmemberList tMmemberList)
+        //{
+        //    _context.TMmemberLists.Add(tMmemberList);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetTMmemberList", new { id = tMmemberList.MemberId }, tMmemberList);
+        //}
+
+        //// DELETE: api/TMmemberListsAPI/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteTMmemberList(int id)
+        //{
+        //    var tMmemberList = await _context.TMmemberLists.FindAsync(id);
+        //    if (tMmemberList == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.TMmemberLists.Remove(tMmemberList);
+        //    await _context.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
 
         private bool TMmemberListExists(int id)
         {
