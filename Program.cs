@@ -90,7 +90,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.CustomSchemaIds(type => type.ToString()); // 避免類型衝突
+    options.OperationFilter<SwaggerFileUploadFilter>(); // 讓 Swagger 支援 file 上傳
+});
 
 var app = builder.Build();
 
@@ -115,6 +119,7 @@ app.UseCors();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
 // Web 應用程式使用 Identity
 app.MapControllerRoute(
     name: "default",
