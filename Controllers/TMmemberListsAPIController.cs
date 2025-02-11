@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using diveWebAPI.Models;
+using diveWebAPI.Partial;
 
 namespace diveWebAPI.Controllers
 {
@@ -13,9 +14,9 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TMmemberListsAPIController : ControllerBase
     {
-        private readonly DiveShopperContext _context;
+        private readonly diveShopperContext _context;
 
-        public TMmemberListsAPIController(DiveShopperContext context)
+        public TMmemberListsAPIController(diveShopperContext context)
         {
             _context = context;
         }

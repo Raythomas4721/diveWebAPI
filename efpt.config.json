@@ -1,0 +1,244 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "diveShopperContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "diveWebAPI",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[ProductStats]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tCcourseCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tCcourseFavorite]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tCcourseLevel]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tCcourseReview]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tCcourses]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tCorderDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tCorders]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMadmin]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMcoachDiving]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMcoachDivingLevel]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMcoaches]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMdivingLevel]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMdivingLevelName]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMdivingStyle]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMfavoriteList]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMmemberDivingLevel]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tMmemberList]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNcart]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNcartItem]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNcolor]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNdiscount]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNgender]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNorder]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNorderDetail]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNpicture]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNproduct]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNproductCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNproductcategoryMapping]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNproductvariants]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNreview]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNsize]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tNthickness]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tScollect]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tSevaluate]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tSorder]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tSorderDetail]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tSphoto]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tSshoppingCart]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tSsiteDetail]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUcategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUorderDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUorderLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUorders]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUorderStatusId]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUproductCondition]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUproductImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUproducts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tUreviews]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserBehaviorLog]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}
