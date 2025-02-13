@@ -160,7 +160,7 @@ namespace diveWebAPI.Controllers
 
         }
         [Authorize]
-        [HttpPut("UpdateUserInfo")]
+        [HttpPatch("UpdateUserInfo")]
         public async Task<IActionResult> UpdateUserInfo([FromBody] EditUserInfo request)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
@@ -184,7 +184,7 @@ namespace diveWebAPI.Controllers
 
             try
             {
-                await _context.SaveChangesAsync(); // 儲存變更
+                await _context.SaveChangesAsync(); 
                 return Ok(new { status = true, message = "使用者資訊變更成功" });
             }
             catch (Exception ex)
@@ -193,47 +193,58 @@ namespace diveWebAPI.Controllers
             };
         }
 
-        //[HttpPatch("ChangeUserPhoto")]
-        //[Consumes("multipart/form-data")] 
-        //public async Task<IActionResult> ChangeUserPhoto([FromForm] IFormFile photo)
-        //{
-        //    var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-        //    if (userId == null || !int.TryParse(userId, out int parsedUserId))
-        //    {
-        //        return Unauthorized(new { message = "無效的 Token，userId 不存在" });
-        //    }
+        [HttpPatch("ChangeUserPhoto")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> ChangeUserPhoto([FromForm] IFormFile photo)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId == null || !int.TryParse(userId, out int parsedUserId))
+            {
+                return Unauthorized(new { message = "無效的 Token，userId 不存在" });
+            }
 
-        //    var user = await _context.TMmemberLists.FindAsync(parsedUserId);
-        //    if (user == null)
-        //    {
-        //        return NotFound(new { message = "找不到該使用者，請確認 userId 是否有效" });
-        //    }
+            var user = await _context.TMmemberLists.FindAsync(parsedUserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "找不到該使用者，請確認 userId 是否有效" });
+            }
 
-        //    if (photo == null || photo.Length == 0)
-        //    {
-        //        return BadRequest(new { message = "未提供圖片" });
-        //    }
+            if (photo == null || photo.Length == 0)
+            {
+                return BadRequest(new { message = "未提供圖片" });
+            }
 
-        //    try
-        //    {
-        //        using (var memoryStream = new MemoryStream())
-        //        {
-        //            await photo.CopyToAsync(memoryStream);
-        //            user.MemberPhoto = memoryStream.ToArray(); // 只修改 photo
-        //        }
+            try
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await photo.CopyToAsync(memoryStream);
+                    byte[] newPhotoBytes = memoryStream.ToArray();
 
-        //        await _context.SaveChangesAsync();
+                    // 計算 Hash 確保圖片不重複
+                    string newPhotoHash = Convert.ToBase64String(SHA256.HashData(newPhotoBytes));
+                    string currentPhotoHash = user.MemberPhoto != null ? Convert.ToBase64String(SHA256.HashData(user.MemberPhoto)) : "";
 
-        //        string contentType = string.IsNullOrEmpty(photo.ContentType) ? "image/jpeg" : photo.ContentType;
-        //        string base64Photo = $"data:{contentType};base64,{Convert.ToBase64String(user.MemberPhoto)}";
+                    if (newPhotoHash == currentPhotoHash)
+                    {
+                        return BadRequest(new { message = "這張圖片正被你使用中！" });
+                    }
 
-        //        return Ok(new { status = true, message = "圖片上傳成功", memberPhoto = base64Photo });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { status = false, message = "圖片上傳失敗", error = ex.Message });
-        //    }
-        //}
+                    user.MemberPhoto = newPhotoBytes;
+                }
+
+                await _context.SaveChangesAsync();
+
+                string contentType = string.IsNullOrEmpty(photo.ContentType) ? "image/jpeg" : photo.ContentType;
+                string base64Photo = $"data:{contentType};base64,{Convert.ToBase64String(user.MemberPhoto)}";
+
+                return Ok(new { status = true, message = "圖片上傳成功", memberPhoto = base64Photo });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { status = false, message = "圖片上傳失敗", error = ex.Message });
+            }
+        }
 
 
 
