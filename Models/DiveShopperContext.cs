@@ -111,6 +111,8 @@ public partial class DiveShopperContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Chinese_Taiwan_Stroke_CI_AS");
+
         modelBuilder.Entity<TCcourse>(entity =>
         {
             entity.HasKey(e => e.CourseId);
@@ -132,6 +134,9 @@ public partial class DiveShopperContext : DbContext
                 .HasColumnName("discription");
             entity.Property(e => e.LevelId).HasColumnName("levelId");
             entity.Property(e => e.Photo).HasColumnName("photo");
+            entity.Property(e => e.StartAt)
+                .HasColumnType("datetime")
+                .HasColumnName("startAt");
             entity.Property(e => e.UpdatedAt)
                 .HasColumnType("datetime")
                 .HasColumnName("updatedAt");
