@@ -4,11 +4,16 @@
     {
         public int CourseId { get; set; }
 
-        public int? CourseCategoryId { get; set; }
+        //public int? CourseCategoryId { get; set; }
 
-        public int? LevelId { get; set; }
+        public string? CategoryName { get; set; }
 
-        public int? CoachId { get; set; }
+        //public int? LevelId { get; set; }
+        public string? LevelName { get; set; }
+
+        //public int? CoachId { get; set; }
+
+        public string? CoachName { get; set; }
 
         public decimal? CoursePrice { get; set; }
 

@@ -26,11 +26,15 @@ namespace diveWebAPI.Controllers
         [HttpGet]
         public async Task<IEnumerable<TCcourseDTO>> GetTCcourses()
         {
-            return _context.TCcourses.Select(e=>new TCcourseDTO {
+            return _context.TCcourses
+                //.Include(e => e.CourseCategory)
+                //.Include(e => e.Level)
+                //.Include(e => e.Coach)
+                .Select(e=>new TCcourseDTO {
                 CourseId=e.CourseId,
-                CourseCategoryId=e.CourseCategoryId,
-                LevelId=e.LevelId,
-                CoachId=e.CoachId,
+                CategoryName = e.CourseCategory.CategoryName,
+                LevelName = e.Level.LevelName,
+                CoachName = e.Coach.CoachName,
                 CoursePrice=e.CoursePrice,
                 Photo=e.Photo,
                 CreatedAt=e.CreatedAt,
@@ -45,7 +49,11 @@ namespace diveWebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<TCcourseDTO> GetTCcourse(int id)
         {
-            var tCcourse = await _context.TCcourses.FindAsync(id);
+            var tCcourse = _context.TCcourses
+                .Include(e => e.CourseCategory)
+                .Include(e => e.Level)
+                .Include(e => e.Coach)
+                .FirstOrDefault(e => e.CourseId == id);
 
             if (tCcourse == null)
             {
@@ -54,9 +62,9 @@ namespace diveWebAPI.Controllers
             TCcourseDTO courseDTO = new TCcourseDTO
             {
                 CourseId = tCcourse.CourseId,
-                CourseCategoryId = tCcourse.CourseCategoryId,
-                LevelId = tCcourse.LevelId,
-                CoachId = tCcourse.CoachId,
+                CategoryName = tCcourse.CourseCategory.CategoryName,
+                LevelName = tCcourse.Level.LevelName,
+                CoachName = tCcourse.Coach.CoachName,
                 CoursePrice = tCcourse.CoursePrice,
                 Photo = tCcourse.Photo,
                 CreatedAt = tCcourse.CreatedAt,
@@ -78,10 +86,13 @@ namespace diveWebAPI.Controllers
             {
                 return "修改課程失敗";
             }
+            int categoryId = _context.TCcourseCategories.FirstOrDefault(e => e.CategoryName == courseDTO.CategoryName).CourseCategoryId;
+            int levelId = _context.TCcourseLevels.FirstOrDefault(e => e.LevelName == courseDTO.LevelName).LevelId;
+            int coachId = _context.TMcoaches.FirstOrDefault(e => e.CoachName == courseDTO.CoachName).CoachId;
             TCcourse tCcourse = await _context.TCcourses.FindAsync(id);
-            tCcourse.CourseCategoryId=courseDTO.CourseCategoryId;
-            tCcourse.LevelId=courseDTO.LevelId;
-            tCcourse.CoachId=courseDTO.CoachId;
+            tCcourse.CourseCategoryId = categoryId;
+            tCcourse.LevelId = levelId;
+            tCcourse.CoachId = coachId;
             tCcourse.CoursePrice = courseDTO.CoursePrice;
             tCcourse.Photo = courseDTO.Photo;
             tCcourse.UpdatedAt = DateTime.Now; 
@@ -116,13 +127,16 @@ namespace diveWebAPI.Controllers
         [HttpPost]
         public async Task<String> PostTCcourse(TCcourseDTO courseDTO)
         {
+            int levelId = _context.TCcourseLevels.FirstOrDefault(e => e.LevelName == courseDTO.LevelName).LevelId;
+            int coachId = _context.TMcoaches.FirstOrDefault(e => e.CoachName == courseDTO.CoachName).CoachId;
+            int categoryId = _context.TCcourseCategories.FirstOrDefault(e => e.CategoryName == courseDTO.CategoryName).CourseCategoryId;
             TCcourse tccourse = new TCcourse {
                 CourseId=0,
-                LevelId=courseDTO.LevelId,
-                CoachId=courseDTO.CoachId,
+                LevelId = levelId,
+                CoachId = coachId,
                 CoursePrice = courseDTO.CoursePrice,
                 Photo = courseDTO.Photo,
-                CourseCategoryId=courseDTO.CourseCategoryId,
+                CourseCategoryId = categoryId,
                 UpdatedAt = DateTime.Now,
                 Discription= courseDTO.Discription,
                 CourseStatus= courseDTO.CourseStatus,
