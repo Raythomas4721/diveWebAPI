@@ -11,6 +11,16 @@ public partial class TNcartItem
 
     public int? MemberId { get; set; }
 
+    public string ProductName { get; set; }
+
+    public string Color { get; set; }
+
+    public string Size { get; set; }
+
+    public string Thickness { get; set; }
+
+    public string Gender { get; set; }
+
     public int? UproductId { get; set; }
 
     public int? ProductvariantsId { get; set; }
@@ -28,8 +38,6 @@ public partial class TNcartItem
     public DateTime? UpdatedDate { get; set; }
 
     public string ImageUrl { get; set; }
-
-    public string ProductName { get; set; }
 
     public virtual TMmemberList Member { get; set; }
 

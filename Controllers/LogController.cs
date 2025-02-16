@@ -36,7 +36,7 @@ namespace diveWebAPI.Controllers
 
             _context.UserBehaviorLogs.Add(entity);
             await _context.SaveChangesAsync();
-            Console.WriteLine(dto.GuestId);
+            Console.WriteLine(dto.MemberId);
             return dto;
 
         }

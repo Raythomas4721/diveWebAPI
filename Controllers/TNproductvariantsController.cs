@@ -190,7 +190,7 @@ namespace diveWebAPI.Controllers
                 select new SizeDTO
                 {
                     SizeId = g.Key.SizeId,
-                    Size = g.Key.Size,  
+                    Size = g.Key.Size,
                     hasStock = g.Sum(x => x.Stock) > 0
                 };
 
@@ -200,7 +200,7 @@ namespace diveWebAPI.Controllers
 
             return q.ToList();
         }
-        
+
 
         // GET: /api/TNproductvariants/colors?productId=123
         [HttpGet("colors")]
@@ -221,7 +221,7 @@ namespace diveWebAPI.Controllers
                 select new ColorDTO
                 {
                     ColorId = g.Key.ColorId,
-                    Color = g.Key.Color,   
+                    Color = g.Key.Color,
                     // 看你 DB 欄位，若是 c.Color => 這裡改成 ColorName = g.Key.Color
                     // hasStock => 只要此 colorId 的 stock 加總 > 0，就表示有庫存
                     hasStock = g.Sum(x => x.Stock) > 0
@@ -234,7 +234,61 @@ namespace diveWebAPI.Controllers
             return query.ToList();
         }
 
+
+
+        [HttpPost("addCart")]
+        public async Task<IActionResult> AddCart([FromBody] TNaddcartDTO dto)
+        {
+            // 1) 找 variant
+            var variant = await _context.TNproductvariants
+                .Include(v => v.Product)
+                .Include(v => v.Color)      // 加這幾行
+    .Include(v => v.Size)
+    .Include(v => v.Thickness)
+    .Include(v => v.Gender)
+                .FirstOrDefaultAsync(v =>
+                    v.ProductId == dto.ProductId &&
+                    v.ColorId == dto.ColorId &&
+                    v.SizeId == dto.SizeId &&
+                    v.ThicknessId == dto.ThicknessId &&
+                    v.GenderId == dto.GenderId
+                );
+            if (variant == null)
+                return Ok(new { success = false, message = "無此變體" });
+
+            // 2) 庫存檢查
+            if (variant.Stock < dto.Quantity)
+                return Ok(new { success = false, message = $"庫存不足，目前僅剩 {variant.Stock} 件" });
+
+            // 3) 從 variant 或 product 取得名/價
+            var productName = variant.Product.ProductName; // e.g. if variant has a navigation "Product"
+            var price = variant.Product.UnitPrice; // or variant.UnitPrice, or variant.Product.Price
+
+            // 查詢顏色、尺寸、厚度、款式名稱
+            var colorName = variant.Color?.Color;
+            var sizeName = variant.Size?.Size;
+            var thicknessName = variant.Thickness?.Thickness;
+            var genderName = variant.Gender?.Gender;
+             var imageUrl = variant.Product?.ImageUrl;
+
+
+            // 注意：**這裡就不進行購物車新增**，僅回傳成功 & 需要的資訊給前端
+            return Ok(new
+            {
+                success = true,
+                message = "庫存充足，可加入購物車",
+                productvariantsId = variant.ProductvariantsId,
+                price,
+                productName,
+                colorName,
+                sizeName,
+                thicknessName,
+                genderName,
+                imageUrl
+            });
+        }
     }
 }
 
-    
+
+
