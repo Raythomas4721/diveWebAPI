@@ -25,6 +25,8 @@ namespace diveWebAPI.DTO
 
         public bool? ProductStatus { get; set; }
 
-        public string[] TUproductImages { get; set; }
+        //public string[] TUproductImages { get; set; }
+        public string[] TUproductImages { get; set; } = Array.Empty<string>();
+
     }
 }

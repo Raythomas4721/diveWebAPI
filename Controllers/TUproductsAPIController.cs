@@ -267,8 +267,19 @@ namespace diveWebAPI.Controllers
         public async Task<IActionResult> PostTUproduct(TUproductsDetailDTO uproductDetailDTO)
         {
             // 取得目前登入的 UserId
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                Console.WriteLine("❌ 無法獲取 UserId，請檢查 JWT Token 是否正確傳遞");
+                return Unauthorized(new { message = "無效的 Token 或用戶未驗證" });
+            }
+
+            Console.WriteLine($"✅ 成功獲取 UserId: {userIdClaim}");
+
+            var userId = int.Parse(userIdClaim);
             // 建立商品
             TUproduct uproduct = new TUproduct
             {
