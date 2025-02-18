@@ -28,5 +28,7 @@
         public bool? CourseStatus { get; set; }
 
         public DateTime? StartAt { get; set; }
+
+        public string Description { get; set; }  // 新增此欄位
     }
 }

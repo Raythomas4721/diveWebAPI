@@ -27,12 +27,13 @@ namespace diveWebAPI.Controllers
         public async Task<IEnumerable<TCcourseDTO>> GetTCcourses()
         {
             return _context.TCcourses
-                //.Include(e => e.CourseCategory)
-                //.Include(e => e.Level)
-                //.Include(e => e.Coach)
+                .Include(e => e.CourseCategory)
+                .Include(e => e.Level)
+                .Include(e => e.Coach)
                 .Select(e=>new TCcourseDTO {
                 CourseId=e.CourseId,
                 CategoryName = e.CourseCategory.CategoryName,
+                Description = e.CourseCategory.Description, // 新增這行
                 LevelName = e.Level.LevelName,
                 CoachName = e.Coach.CoachName,
                 CoursePrice=e.CoursePrice,
@@ -176,6 +177,14 @@ namespace diveWebAPI.Controllers
         private bool TCcourseExists(int id)
         {
             return _context.TCcourses.Any(e => e.CourseId == id);
+        }
+
+        [HttpGet("categories")]
+        public async Task<IEnumerable<string>> GetCourseCategories()
+        {
+            return await _context.TCcourseCategories
+                .Select(c => c.CategoryName)
+                .ToListAsync();
         }
     }
 }
