@@ -27,6 +27,8 @@ public partial class TCcourse
 
     public bool? CourseStatus { get; set; }
 
+    public DateTime? StartAt { get; set; }
+
     public virtual TMcoach Coach { get; set; }
 
     public virtual TCcourseCategory CourseCategory { get; set; }
