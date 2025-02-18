@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Azure.Core;
+using Microsoft.AspNetCore.Cors;
 
 namespace diveWebAPI.Controllers
 {
@@ -67,20 +68,20 @@ namespace diveWebAPI.Controllers
         }
         private string GenerateJwtToken(TMmemberList user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq")); // 密鑰
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq")); 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.MemberEmail),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("userId", user.MemberId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.MemberEmail),
                 new Claim("name", user.MemberName)
             };
 
             var token = new JwtSecurityToken(
-                issuer: "diveShopper", // 發行者
-                audience: "diveShopperClient", // 受眾
+                issuer: "diveShopper",
+                audience: "diveShopperClient",
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: creds
@@ -129,27 +130,33 @@ namespace diveWebAPI.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetUserProfile()
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userId == null || !int.TryParse(userId, out int parsedUserId))
+            var userIdClaim = User.FindFirst("userId")?.Value; 
+
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int parsedUserId))
             {
-                return Unauthorized(new { message = "無效的 Token，userId 不存在" });
+                Console.WriteLine(" Token 解析 `userId` 失敗！");
+                return Unauthorized(new { message = "無效的 Token，解析 `userId` 失敗" });
             }
+
+            Console.WriteLine($"解析 `userId`: {parsedUserId}");
 
             var user = await _context.TMmemberLists.FindAsync(parsedUserId);
             if (user == null)
             {
+                Console.WriteLine($"找不到該使用者 `userId`: {parsedUserId}");
                 return NotFound(new { message = "找不到該使用者" });
             }
 
-            string? base64Photo = user.MemberPhoto != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(user.MemberPhoto)}" : null;
+            Console.WriteLine("成功獲取用戶資訊，返回資料");
 
             return Ok(new
             {
-                userId = parsedUserId,
+                memberId = parsedUserId,
                 message = "成功獲取用戶資訊",
                 user
             });
         }
+
         public class EditUserInfo
         {
             public string? MemberName { get; set; }
@@ -159,6 +166,7 @@ namespace diveWebAPI.Controllers
             public string? UrgentPhone { get; set; }
 
         }
+        
         [Authorize]
         [HttpPatch("UpdateUserInfo")]
         public async Task<IActionResult> UpdateUserInfo([FromBody] EditUserInfo request)
@@ -184,7 +192,7 @@ namespace diveWebAPI.Controllers
 
             try
             {
-                await _context.SaveChangesAsync(); 
+                await _context.SaveChangesAsync();
                 return Ok(new { status = true, message = "使用者資訊變更成功" });
             }
             catch (Exception ex)
@@ -192,9 +200,10 @@ namespace diveWebAPI.Controllers
                 return StatusCode(500, new { status = false, message = "更新使用者資訊時發生錯誤", error = ex.Message });
             };
         }
-
-        [HttpPatch("ChangeUserPhoto")]
+        [Authorize]
+        [HttpPut("ChangeUserPhoto")]
         [Consumes("multipart/form-data")]
+        [Produces("application/json")]
         public async Task<IActionResult> ChangeUserPhoto([FromForm] IFormFile photo)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
@@ -245,8 +254,40 @@ namespace diveWebAPI.Controllers
                 return StatusCode(500, new { status = false, message = "圖片上傳失敗", error = ex.Message });
             }
         }
+        public class ChangePasswordDTO
+        {
+            public string CurrentPassword { get; set; }
+            public string NewPassword { get; set; }
 
+        }
+        [Authorize]
+        [HttpPut("changePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId == null || !int.TryParse(userId, out int parsedUserId))
+            {
+                return Unauthorized(new { message = "無效的 Token" });
+            }
 
+            var user = await _context.TMmemberLists.FindAsync(parsedUserId);
+            if (user == null)
+            {
+                return NotFound(new { message = "找不到該使用者" });
+            }
+
+            // 確認舊密碼
+            if (!BCrypt.Net.BCrypt.Verify(model.CurrentPassword, user.MemberPassword))
+            {
+                return BadRequest(new { message = "舊密碼錯誤" });
+            }
+
+            // 更新新密碼
+            user.MemberPassword = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "密碼更新成功" });
+        }
 
 
 

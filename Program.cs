@@ -1,6 +1,7 @@
 using diveWebAPI.Data;
-using diveWebAPI.Models;
-using diveWebAPI.Partial;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,35 +12,51 @@ using DiveShopperContext = diveWebAPI.Models.DiveShopperContext;
 var builder = WebApplication.CreateBuilder(args);
 
 // 設定資料庫連線
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDbContext<DiveShopperContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DiveShopper"));
 });
-
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 // CORS 設定
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
+    options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            policy.SetIsOriginAllowed(_ => true) 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
         });
 });
 
-
+// 設定 Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// 設定身份驗證
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; 
+})
+.AddCookie()
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false; // 開發環境禁用 HTTPS 強制
+    options.RequireHttpsMetadata = false;
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -47,41 +64,39 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "diveShopper", // 發行者
-            ValidAudience = "diveShopperClient", // 受眾
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq")) // 密鑰
+        ValidIssuer = "diveShopper",
+        ValidAudience = "diveShopperClient",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq"))
         };
+})
+.AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    googleOptions.CallbackPath = new PathString("/signin-google");
+    googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
+    googleOptions.SaveTokens = true;
 
-        // JWT 驗證事件
-        options.Events = new JwtBearerEvents
-        {
-            OnAuthenticationFailed = context =>
-            {
-                Console.WriteLine($"Token 驗證失敗: {context.Exception.Message}");
-                if (context.Exception.InnerException != null)
-                {
-                    Console.WriteLine($"內部錯誤: {context.Exception.InnerException.Message}");
-                }
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
-            {
-                Console.WriteLine("Token 驗證成功");
-                return Task.CompletedTask;
-            }
-        };
+    googleOptions.Scope.Add("openid");
+    googleOptions.Scope.Add("profile");
+    googleOptions.Scope.Add("email");
+
+    googleOptions.ClaimActions.MapJsonKey("picture", "picture", "url");
     });
 
+// 啟用授權
+builder.Services.AddAuthorization();
 
-builder.Services.AddAuthorization(); // 啟用授權
-
+// 設定 Cookie
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Events.OnRedirectToLogin = context =>
     {
         if (context.Request.Path.StartsWithSegments("/api"))
         {
-            context.Response.StatusCode = 401; // API 不導向登入頁面，而是回傳 401
+            context.Response.StatusCode = 401;
             return Task.CompletedTask;
         }
         context.Response.Redirect(context.RedirectUri);
@@ -89,16 +104,18 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
+// 設定 API Controller & Swagger
 builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.CustomSchemaIds(type => type.ToString()); // 避免類型衝突
-    options.OperationFilter<SwaggerFileUploadFilter>(); // 讓 Swagger 支援 file 上傳
+    options.CustomSchemaIds(type => type.ToString());
+    options.OperationFilter<SwaggerFileUploadFilter>();
 });
 
+// 建立應用程式
 var app = builder.Build();
 
-// 開發模式錯誤處理
+// 開發環境錯誤處理
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -109,7 +126,7 @@ else
     app.UseHsts();
 }
 
-
+// 中介軟體設定
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSwagger();
@@ -117,13 +134,17 @@ app.UseSwaggerUI();
 app.UseCors();
 
 app.UseRouting();
+app.UseSession();
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSwagger();
+app.UseSwaggerUI();
 
-// Web 應用程式使用 Identity
+// 設定 API 路由
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages(); // 這行是 Web UI 的 Razor Pages，不影響 API
+app.MapRazorPages();
 
 app.Run();
