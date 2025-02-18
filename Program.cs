@@ -54,20 +54,20 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; 
 })
 .AddCookie()
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
+    options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
         ValidIssuer = "diveShopper",
         ValidAudience = "diveShopperClient",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq"))
-    };
+        };
 })
 .AddGoogle(googleOptions =>
 {
@@ -82,7 +82,7 @@ builder.Services.AddAuthentication(options =>
     googleOptions.Scope.Add("email");
 
     googleOptions.ClaimActions.MapJsonKey("picture", "picture", "url");
-});
+    });
 
 // 啟用授權
 builder.Services.AddAuthorization();
@@ -129,11 +129,14 @@ else
 // 中介軟體設定
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseCors();
 
 app.UseRouting();
 app.UseSession();
 app.UseCors("AllowAll");
-app.UseAuthentication();  
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI();
