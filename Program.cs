@@ -10,7 +10,7 @@ using System.Text;
 using DiveShopperContext = diveWebAPI.Models.DiveShopperContext;
 
 var builder = WebApplication.CreateBuilder(args);
-
+Console.WriteLine($"Google ClientId: {builder.Configuration["Authentication:Google:ClientId"]}");
 // 設定資料庫連線
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
