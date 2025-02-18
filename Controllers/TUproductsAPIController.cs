@@ -26,11 +26,11 @@ namespace diveWebAPI.Controllers
         }
 
         // GET: api/TUproductsAPI
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TUproduct>>> GetTUproducts()
-        {
-            return await _context.TUproducts.ToListAsync();
-        }
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<TUproduct>>> GetTUproducts()
+        //{
+        //    return await _context.TUproducts.ToListAsync();
+        //}
         // GET: api/TUproductsAPI
         [HttpGet]
         public async Task<IEnumerable<TUproductsAllDTO>> GetTUproducts(
