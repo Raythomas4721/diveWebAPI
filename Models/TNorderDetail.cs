@@ -26,6 +26,4 @@ public partial class TNorderDetail
     public virtual TNproductvariant Productvariants { get; set; }
 
     public virtual TNdiscount SubtotalNavigation { get; set; }
-
-    public virtual ICollection<TNreview> TNreviews { get; set; } = new List<TNreview>();
 }
