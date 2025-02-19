@@ -72,22 +72,21 @@ namespace diveWebAPI.Controllers
 
             return NoContent();
         }
-     
-        // POST: api/TNorders
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
-        public async Task<ActionResult<TNorder>> PostTNorder(TNcreateOrderDTO dto)
+        public async Task<ActionResult<TNorderDTO>> PostTNorder(TNcreateOrderDTO dto)
         {
-            // 1) 建立一個 TNorder 物件
-        var tNorder = new TNorder
-        {
-            MemberId = dto.MemberId,
-            PaymentMethod = dto.PaymentMethod,
-            ShipAddress = dto.ShipAddress,
-            ShipPhone = dto.ShipPhone,
-            OrderStatus = "Pending",  // 或預設 "New" / "Processing"
-            CreatedDate = DateTime.Now
-        };
+            // 1) 建立一個 TNorder 物件 (EF Model)
+            var tNorder = new TNorder
+            {
+                MemberId = dto.MemberId,
+                PaymentMethod = dto.PaymentMethod,
+                ShipAddress = dto.ShipAddress,
+                ShipPhone = dto.ShipPhone,
+                OrderStatus = "Pending",  // 或預設 "New" / "Processing"
+                CreatedDate = DateTime.Now
+            };
+
             // 2) 計算 totalAmount
             decimal total = 0;
 
@@ -97,14 +96,14 @@ namespace diveWebAPI.Controllers
                 // 計算該明細小計
                 decimal lineSubtotal = item.UnitPriceAtOrder * item.Quantity - item.DiscountAmount;
 
-                // 建立一筆 TNorderDetail
+                // 建立一筆 TNorderDetail (EF Model)
                 var od = new TNorderDetail
                 {
                     ProductvariantsId = item.ProductvariantsId,
                     UnitPriceAtOrder = item.UnitPriceAtOrder,
                     Quantity = item.Quantity,
                     DiscountAmount = item.DiscountAmount,
-                    Subtotal = (int?)lineSubtotal, // 注意你的 Subtotal 是 int?，若需要小數就改 DB schema or cast properly
+                    Subtotal = (int?)lineSubtotal,
                 };
 
                 // 放到 order 的關聯集合
@@ -120,24 +119,69 @@ namespace diveWebAPI.Controllers
             _context.TNorders.Add(tNorder);
             await _context.SaveChangesAsync();
 
-            // 6) 回傳剛建立的訂單資訊(也可做DTO化)
-            return CreatedAtAction(nameof(GetSingleOrder), new { id = tNorder.OrderId }, tNorder);
+            // 6) 回傳剛建立的訂單資訊 => 轉成 TNorderDTO
+            var orderDto = new TNorderDTO
+            {
+                OrderId = tNorder.OrderId,
+                MemberId = tNorder.MemberId,
+                PaymentMethod = tNorder.PaymentMethod,
+                ShipAddress = tNorder.ShipAddress,
+                ShipPhone = tNorder.ShipPhone,
+                OrderStatus = tNorder.OrderStatus,
+                CreatedDate = tNorder.CreatedDate,
+                TotalAmount = tNorder.TotalAmount,
+                OrderDetails = tNorder.TNorderDetails.Select(od => new TNorderDetailDTO
+                {
+                    OrderDetailId = od.OrderDetailsId,
+                    ProductvariantsId = od.ProductvariantsId,
+                    UnitPriceAtOrder = od.UnitPriceAtOrder,
+                    Quantity = od.Quantity,
+                    DiscountAmount = od.DiscountAmount,
+                    Subtotal = od.Subtotal
+                }).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetSingleOrder), new { id = tNorder.OrderId }, orderDto);
         }
 
         // 若想要查詢單筆訂單
         [HttpGet("single/{id}")]
-        public async Task<ActionResult<TNorder>> GetSingleOrder(int id)
+        public async Task<ActionResult<TNorderDTO>> GetSingleOrder(int id)
         {
             var order = await _context.TNorders
                 .Include(o => o.TNorderDetails)
                 .FirstOrDefaultAsync(o => o.OrderId == id);
 
-            if (order == null) return NotFound();
+            if (order == null)
+                return NotFound();
 
-            return order;
+            // 轉成 DTO
+            var orderDto = new TNorderDTO
+            {
+                OrderId = order.OrderId,
+                MemberId = order.MemberId,
+                PaymentMethod = order.PaymentMethod,
+                ShipAddress = order.ShipAddress,
+                ShipPhone = order.ShipPhone,
+                OrderStatus = order.OrderStatus,
+                CreatedDate = order.CreatedDate,
+                TotalAmount = order.TotalAmount,
+                OrderDetails = order.TNorderDetails
+                    .Select(od => new TNorderDetailDTO
+                    {
+                        OrderDetailId = od.OrderDetailsId,
+                        ProductvariantsId = od.ProductvariantsId,
+                        UnitPriceAtOrder = od.UnitPriceAtOrder,
+                        Quantity = od.Quantity,
+                        DiscountAmount = od.DiscountAmount,
+                        Subtotal = od.Subtotal
+                    })
+                    .ToList()
+            };
+
+            return orderDto;
         }
 
-        
 
         // DELETE: api/TNorders/5
         [HttpDelete("{id}")]

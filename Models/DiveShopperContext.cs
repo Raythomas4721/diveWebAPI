@@ -147,6 +147,9 @@ public partial class diveShopperContext : DbContext
                 .HasColumnName("discription");
             entity.Property(e => e.LevelId).HasColumnName("levelId");
             entity.Property(e => e.Photo).HasColumnName("photo");
+            entity.Property(e => e.StartAt)
+                .HasColumnType("datetime")
+                .HasColumnName("startAt");
             entity.Property(e => e.UpdatedAt)
                 .HasColumnType("datetime")
                 .HasColumnName("updatedAt");
@@ -594,7 +597,7 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.EndDate)
                 .HasColumnType("datetime")
                 .HasColumnName("endDate");
-            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
+            entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
             entity.Property(e => e.StartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("startDate");
@@ -794,9 +797,15 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createdDate");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.MemberName)
+                .HasMaxLength(80)
+                .HasColumnName("memberName");
             entity.Property(e => e.ProductId).HasColumnName("productId");
             entity.Property(e => e.ReviewContent).HasColumnName("reviewContent");
             entity.Property(e => e.ReviewRating).HasColumnName("reviewRating");
+            entity.Property(e => e.UpdateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("updateDate");
 
             entity.HasOne(d => d.Member).WithMany(p => p.TNreviews)
                 .HasForeignKey(d => d.MemberId)

@@ -17,7 +17,11 @@ public partial class TNreview
 
     public DateTime? CreatedDate { get; set; }
 
+    public DateTime? UpdateDate { get; set; }
+
     public int? ProductId { get; set; }
+
+    public string MemberName { get; set; }
 
     public virtual TMmemberList Member { get; set; }
 }
