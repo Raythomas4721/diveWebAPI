@@ -112,7 +112,6 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SwaggerFileUploadFilter>();
 });
 
-// 建立應用程式
 var app = builder.Build();
 
 // 開發環境錯誤處理

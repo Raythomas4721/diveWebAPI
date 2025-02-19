@@ -15,6 +15,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[ProductStats]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[tCcourseCategory]",
          "ObjectType": 0
       },
@@ -204,6 +208,10 @@
       },
       {
          "Name": "[dbo].[tUreviews]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserBehaviorLog]",
          "ObjectType": 0
       }
    ],
