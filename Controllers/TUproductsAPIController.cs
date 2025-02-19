@@ -18,9 +18,9 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TUproductsAPIController : ControllerBase
     {
-        private readonly DiveShopperContext _context;
+        private readonly diveShopperContext _context;
 
-        public TUproductsAPIController(DiveShopperContext context)
+        public TUproductsAPIController(diveShopperContext context)
         {
             _context = context;
         }

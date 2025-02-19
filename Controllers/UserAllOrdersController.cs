@@ -9,8 +9,8 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class UserAllOrdersController : ControllerBase
     {
-        private readonly DiveShopperContext _context;
-        public UserAllOrdersController(DiveShopperContext context)
+        private readonly diveShopperContext _context;
+        public UserAllOrdersController(diveShopperContext context)
         {
             _context = context;
         }
