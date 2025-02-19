@@ -168,7 +168,7 @@ namespace diveWebAPI.Controllers
         }
         
         [Authorize]
-        [HttpPatch("UpdateUserInfo")]
+        [HttpPut("UpdateUserInfo")]
         public async Task<IActionResult> UpdateUserInfo([FromBody] EditUserInfoDTO request)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
