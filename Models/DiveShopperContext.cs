@@ -506,16 +506,34 @@ public partial class DiveShopperContext : DbContext
             entity.ToTable("tNcartItem");
 
             entity.Property(e => e.CartitemId).HasColumnName("cartitemId");
+            entity.Property(e => e.Color)
+                .HasMaxLength(50)
+                .HasColumnName("color");
             entity.Property(e => e.Condition)
                 .HasMaxLength(50)
                 .HasColumnName("condition");
             entity.Property(e => e.CreationDate)
                 .HasColumnType("datetime")
                 .HasColumnName("creationDate");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(50)
+                .HasColumnName("gender");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(50)
+                .HasColumnName("imageUrl");
             entity.Property(e => e.IsLocked).HasColumnName("is_locked");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.ProductName)
+                .HasMaxLength(50)
+                .HasColumnName("productName");
             entity.Property(e => e.ProductvariantsId).HasColumnName("productvariantsId");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.Size)
+                .HasMaxLength(50)
+                .HasColumnName("size");
+            entity.Property(e => e.Thickness)
+                .HasMaxLength(50)
+                .HasColumnName("thickness");
             entity.Property(e => e.UnitpriceatCart)
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("unitpriceatCart");
@@ -534,6 +552,7 @@ public partial class DiveShopperContext : DbContext
 
             entity.HasOne(d => d.Uproduct).WithMany(p => p.TNcartItems)
                 .HasForeignKey(d => d.UproductId)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_tNcartItem_tUproducts");
         });
 
@@ -643,6 +662,7 @@ public partial class DiveShopperContext : DbContext
 
             entity.HasOne(d => d.SubtotalNavigation).WithMany(p => p.TNorderDetails)
                 .HasForeignKey(d => d.Subtotal)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_tNorderDetail_tNdiscount");
         });
 
@@ -669,9 +689,7 @@ public partial class DiveShopperContext : DbContext
             entity.ToTable("tNproduct");
 
             entity.Property(e => e.ProductId).HasColumnName("productId");
-            entity.Property(e => e.Description)
-                .HasMaxLength(50)
-                .HasColumnName("description");
+            entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(50)
                 .HasColumnName("imageUrl");
@@ -766,17 +784,19 @@ public partial class DiveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createdDate");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
-            entity.Property(e => e.OrderDetailsId).HasColumnName("orderDetailsId");
+            entity.Property(e => e.MemberName)
+                .HasMaxLength(80)
+                .HasColumnName("memberName");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
             entity.Property(e => e.ReviewContent).HasColumnName("reviewContent");
             entity.Property(e => e.ReviewRating).HasColumnName("reviewRating");
+            entity.Property(e => e.UpdateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("updateDate");
 
             entity.HasOne(d => d.Member).WithMany(p => p.TNreviews)
                 .HasForeignKey(d => d.MemberId)
                 .HasConstraintName("FK_tNreview_tMmemberList");
-
-            entity.HasOne(d => d.OrderDetails).WithMany(p => p.TNreviews)
-                .HasForeignKey(d => d.OrderDetailsId)
-                .HasConstraintName("FK_tNreview_tNorderDetail");
         });
 
         modelBuilder.Entity<TNsize>(entity =>

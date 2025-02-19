@@ -11,15 +11,17 @@ public partial class TNreview
 
     public int? MemberId { get; set; }
 
-    public int? OrderDetailsId { get; set; }
-
     public string ReviewContent { get; set; }
 
     public int? ReviewRating { get; set; }
 
     public DateTime? CreatedDate { get; set; }
 
-    public virtual TMmemberList Member { get; set; }
+    public DateTime? UpdateDate { get; set; }
 
-    public virtual TNorderDetail OrderDetails { get; set; }
+    public int? ProductId { get; set; }
+
+    public string MemberName { get; set; }
+
+    public virtual TMmemberList Member { get; set; }
 }
