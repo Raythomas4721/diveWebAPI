@@ -72,6 +72,7 @@ namespace diveWebAPI.Controllers
             });
             return productList;
         }
+       
         private string ConvertToThumbnailBase64(byte[] imageData, int width, int height)
         {
             using (var ms = new MemoryStream(imageData))
