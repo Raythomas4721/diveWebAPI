@@ -41,6 +41,7 @@ namespace diveWebAPI.Controllers
         {
             var products = await _context.TUproducts
                 .Include(p => p.TUproductImages) // 載入商品圖片
+                .Include(p => p.Seller)
                 .Where(p => (bool)p.ProductStatus) // 只篩選 ProductStatus 為 true 的商品
                 .Where(p => string.IsNullOrEmpty(keyword) || p.ProductName.Contains(keyword) || p.ProductDescription.Contains(keyword)) // 關鍵字搜尋
                 .Where(p => !categoryId.HasValue || p.CategoryId == categoryId) // 篩選類別
@@ -53,7 +54,7 @@ namespace diveWebAPI.Controllers
             var productList = products.Select(p => new TUproductsAllDTO
             {
                 ProductId = p.UproductId,
-                SellerId = p.SellerId,
+                SellerName = p.Seller.MemberName,
                 CategoryId = p.CategoryId,
                 ProductName = p.ProductName,
                 ProductDescription = p.ProductDescription,
@@ -69,7 +70,6 @@ namespace diveWebAPI.Controllers
                         ? ConvertToThumbnailBase64(firstImage, 200, 200)
                         : null // 轉換圖片為縮圖
             });
-
             return productList;
         }
         private string ConvertToThumbnailBase64(byte[] imageData, int width, int height)
