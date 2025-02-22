@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DiveShopperContext = diveWebAPI.Models.diveShopperContext;
+using DiveShopperContext = diveWebAPI.Models.DiveShopperContext;
 
 var builder = WebApplication.CreateBuilder(args);
 

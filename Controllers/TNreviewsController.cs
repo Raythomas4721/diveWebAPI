@@ -15,9 +15,9 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TNreviewsController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
 
-        public TNreviewsController(diveShopperContext context)
+        public TNreviewsController(DiveShopperContext context)
         {
             _context = context;
         }

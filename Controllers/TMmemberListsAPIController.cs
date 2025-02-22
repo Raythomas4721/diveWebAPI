@@ -24,9 +24,9 @@ namespace diveWebAPI.Controllers
     [Route("api/[controller]")]
     public class TMmemberListsAPIController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
 
-        public TMmemberListsAPIController(diveShopperContext context)
+        public TMmemberListsAPIController(DiveShopperContext context)
         {
             _context = context;
         }

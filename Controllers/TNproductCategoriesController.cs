@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using diveWebAPI.Models;
 using diveWebAPI.DTO;
-using diveWebAPI.Partial;
+
 
 namespace diveWebAPI.Controllers
 {
@@ -15,9 +15,9 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TNproductCategoriesController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
 
-        public TNproductCategoriesController(diveShopperContext context)
+        public TNproductCategoriesController(DiveShopperContext context)
         {
             _context = context;
         }

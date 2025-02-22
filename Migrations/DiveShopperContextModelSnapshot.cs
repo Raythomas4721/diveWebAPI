@@ -10,7 +10,7 @@ using diveWebAPI.Models;
 
 namespace diveWebAPI.Migrations
 {
-    [DbContext(typeof(diveShopperContext))]
+    [DbContext(typeof(DiveShopperContext))]
     partial class DiveShopperContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

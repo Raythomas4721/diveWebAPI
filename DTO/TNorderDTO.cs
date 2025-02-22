@@ -20,6 +20,10 @@ namespace diveWebAPI.DTO
 
         public DateTime? CreatedDate { get; set; }
 
+        public DateTime? PaymentDate { get; set; }
+
+        public string? MerchantTradeNo { get; set; }
+
         public List<TNorderDetailDTO> OrderDetails { get; set; } = new();
 
 

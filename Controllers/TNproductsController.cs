@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using diveWebAPI.Models;
 using Microsoft.CodeAnalysis;
 using diveWebAPI.DTO;
-using diveWebAPI.Partial;
+
 
 namespace diveWebAPI.Controllers
 {
@@ -16,9 +16,9 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TNproductsController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
 
-        public TNproductsController(diveShopperContext context)
+        public TNproductsController(DiveShopperContext context)
         {
             _context = context;
         }

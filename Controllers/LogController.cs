@@ -10,9 +10,9 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class LogController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
 
-        public LogController(diveShopperContext context)
+        public LogController(DiveShopperContext context)
         {
             _context = context;
         }

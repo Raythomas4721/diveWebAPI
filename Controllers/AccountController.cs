@@ -19,10 +19,10 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
         private readonly HttpClient _httpClient;
 
-        public AccountController(diveShopperContext context)
+        public AccountController(DiveShopperContext context)
         {
             _context = context;
             _httpClient = new HttpClient();

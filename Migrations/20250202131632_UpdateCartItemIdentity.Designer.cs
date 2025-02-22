@@ -11,7 +11,7 @@ using diveWebAPI.Models;
 
 namespace diveWebAPI.Migrations
 {
-    [DbContext(typeof(diveShopperContext))]
+    [DbContext(typeof(DiveShopperContext))]
     [Migration("20250202131632_UpdateCartItemIdentity")]
     partial class UpdateCartItemIdentity
     {
