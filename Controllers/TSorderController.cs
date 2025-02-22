@@ -11,47 +11,47 @@ namespace diveWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TMmemberListsAPIController : ControllerBase
+    public class TSorderController : ControllerBase
     {
         private readonly diveShopperContext _context;
 
-        public TMmemberListsAPIController(diveShopperContext context)
+        public TSorderController(diveShopperContext context)
         {
             _context = context;
         }
 
-        // GET: api/TMmemberListsAPI
+        // GET: api/TSorder
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TMmemberList>>> GetTMmemberLists()
+        public async Task<ActionResult<IEnumerable<TSorder>>> GetTSorders()
         {
-            return await _context.TMmemberLists.ToListAsync();
+            return await _context.TSorders.ToListAsync();
         }
 
-        // GET: api/TMmemberListsAPI/5
+        // GET: api/TSorder/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TMmemberList>> GetTMmemberList(int id)
+        public async Task<ActionResult<TSorder>> GetTSorder(int id)
         {
-            var tMmemberList = await _context.TMmemberLists.FindAsync(id);
+            var tSorder = await _context.TSorders.FindAsync(id);
 
-            if (tMmemberList == null)
+            if (tSorder == null)
             {
                 return NotFound();
             }
 
-            return tMmemberList;
+            return tSorder;
         }
 
-        // PUT: api/TMmemberListsAPI/5
+        // PUT: api/TSorder/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTMmemberList(int id, TMmemberList tMmemberList)
+        public async Task<IActionResult> PutTSorder(int id, TSorder tSorder)
         {
-            if (id != tMmemberList.MemberId)
+            if (id != tSorder.OrderId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(tMmemberList).State = EntityState.Modified;
+            _context.Entry(tSorder).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +59,7 @@ namespace diveWebAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TMmemberListExists(id))
+                if (!TSorderExists(id))
                 {
                     return NotFound();
                 }
@@ -72,36 +72,36 @@ namespace diveWebAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/TMmemberListsAPI
+        // POST: api/TSorder
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<TMmemberList>> PostTMmemberList(TMmemberList tMmemberList)
+        public async Task<ActionResult<TSorder>> PostTSorder(TSorder tSorder)
         {
-            _context.TMmemberLists.Add(tMmemberList);
+            _context.TSorders.Add(tSorder);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTMmemberList", new { id = tMmemberList.MemberId }, tMmemberList);
+            return CreatedAtAction("GetTSorder", new { id = tSorder.OrderId }, tSorder);
         }
 
-        // DELETE: api/TMmemberListsAPI/5
+        // DELETE: api/TSorder/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTMmemberList(int id)
+        public async Task<IActionResult> DeleteTSorder(int id)
         {
-            var tMmemberList = await _context.TMmemberLists.FindAsync(id);
-            if (tMmemberList == null)
+            var tSorder = await _context.TSorders.FindAsync(id);
+            if (tSorder == null)
             {
                 return NotFound();
             }
 
-            _context.TMmemberLists.Remove(tMmemberList);
+            _context.TSorders.Remove(tSorder);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TMmemberListExists(int id)
+        private bool TSorderExists(int id)
         {
-            return _context.TMmemberLists.Any(e => e.MemberId == id);
+            return _context.TSorders.Any(e => e.OrderId == id);
         }
     }
 }
