@@ -35,7 +35,7 @@ namespace diveWebAPI.Controllers
         [HttpGet]
         public async Task<IEnumerable<TUproductsAllDTO>> GetTUproducts(
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 6,
+            [FromQuery] int pageSize = 8,
             [FromQuery] string? keyword = null,
             [FromQuery] int? categoryId = null)
         {
