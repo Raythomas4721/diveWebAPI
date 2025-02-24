@@ -232,15 +232,10 @@ public partial class diveShopperContext : DbContext
             entity.ToTable("tCorders");
 
             entity.Property(e => e.OrderId).HasColumnName("orderId");
-            entity.Property(e => e.CourseId).HasColumnName("courseId");
-            entity.Property(e => e.CoursePrice)
-                .HasColumnType("money")
-                .HasColumnName("coursePrice");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
             entity.Property(e => e.OrderDate)
                 .HasColumnType("datetime")
                 .HasColumnName("orderDate");
-            entity.Property(e => e.Quantity).HasColumnName("quantity");
 
             entity.HasOne(d => d.Member).WithMany(p => p.TCorders)
                 .HasForeignKey(d => d.MemberId)
@@ -484,16 +479,34 @@ public partial class diveShopperContext : DbContext
             entity.ToTable("tNcartItem");
 
             entity.Property(e => e.CartitemId).HasColumnName("cartitemId");
+            entity.Property(e => e.Color)
+                .HasMaxLength(50)
+                .HasColumnName("color");
             entity.Property(e => e.Condition)
                 .HasMaxLength(50)
                 .HasColumnName("condition");
             entity.Property(e => e.CreationDate)
                 .HasColumnType("datetime")
                 .HasColumnName("creationDate");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(50)
+                .HasColumnName("gender");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(50)
+                .HasColumnName("imageUrl");
             entity.Property(e => e.IsLocked).HasColumnName("is_locked");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.ProductName)
+                .HasMaxLength(50)
+                .HasColumnName("productName");
             entity.Property(e => e.ProductvariantsId).HasColumnName("productvariantsId");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
+            entity.Property(e => e.Size)
+                .HasMaxLength(50)
+                .HasColumnName("size");
+            entity.Property(e => e.Thickness)
+                .HasMaxLength(50)
+                .HasColumnName("thickness");
             entity.Property(e => e.UnitpriceatCart)
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("unitpriceatCart");
@@ -512,6 +525,7 @@ public partial class diveShopperContext : DbContext
 
             entity.HasOne(d => d.Uproduct).WithMany(p => p.TNcartItems)
                 .HasForeignKey(d => d.UproductId)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_tNcartItem_tUproducts");
         });
 
@@ -543,10 +557,14 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.EndDate)
                 .HasColumnType("datetime")
                 .HasColumnName("endDate");
-            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
+            entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
             entity.Property(e => e.StartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("startDate");
+
+            entity.HasOne(d => d.ProductCategory).WithMany(p => p.TNdiscounts)
+                .HasForeignKey(d => d.ProductCategoryId)
+                .HasConstraintName("FK_tNdiscount_tNproductCategory");
         });
 
         modelBuilder.Entity<TNgender>(entity =>
@@ -572,9 +590,11 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createdDate");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.MerchantTradeNo).HasMaxLength(50);
             entity.Property(e => e.OrderStatus)
                 .HasMaxLength(50)
                 .HasColumnName("orderStatus");
+            entity.Property(e => e.PaymentDate).HasColumnType("datetime");
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(50)
                 .HasColumnName("paymentMethod");
@@ -618,10 +638,6 @@ public partial class diveShopperContext : DbContext
             entity.HasOne(d => d.Productvariants).WithMany(p => p.TNorderDetails)
                 .HasForeignKey(d => d.ProductvariantsId)
                 .HasConstraintName("FK_tNorderDetail_tNproductvariants");
-
-            entity.HasOne(d => d.SubtotalNavigation).WithMany(p => p.TNorderDetails)
-                .HasForeignKey(d => d.Subtotal)
-                .HasConstraintName("FK_tNorderDetail_tNdiscount");
         });
 
         modelBuilder.Entity<TNpicture>(entity =>
@@ -647,9 +663,7 @@ public partial class diveShopperContext : DbContext
             entity.ToTable("tNproduct");
 
             entity.Property(e => e.ProductId).HasColumnName("productId");
-            entity.Property(e => e.Description)
-                .HasMaxLength(50)
-                .HasColumnName("description");
+            entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(50)
                 .HasColumnName("imageUrl");
@@ -744,17 +758,19 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createdDate");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
-            entity.Property(e => e.OrderDetailsId).HasColumnName("orderDetailsId");
+            entity.Property(e => e.MemberName)
+                .HasMaxLength(80)
+                .HasColumnName("memberName");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
             entity.Property(e => e.ReviewContent).HasColumnName("reviewContent");
             entity.Property(e => e.ReviewRating).HasColumnName("reviewRating");
+            entity.Property(e => e.UpdateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("updateDate");
 
             entity.HasOne(d => d.Member).WithMany(p => p.TNreviews)
                 .HasForeignKey(d => d.MemberId)
                 .HasConstraintName("FK_tNreview_tMmemberList");
-
-            entity.HasOne(d => d.OrderDetails).WithMany(p => p.TNreviews)
-                .HasForeignKey(d => d.OrderDetailsId)
-                .HasConstraintName("FK_tNreview_tNorderDetail");
         });
 
         modelBuilder.Entity<TNsize>(entity =>
@@ -815,7 +831,9 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.SitePay)
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("sitePay");
-            entity.Property(e => e.SiteTime).HasColumnName("siteTime");
+            entity.Property(e => e.SiteTime)
+                .HasPrecision(0)
+                .HasColumnName("siteTime");
             entity.Property(e => e.VenueName)
                 .HasMaxLength(50)
                 .HasColumnName("venueName");
@@ -841,7 +859,9 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.SitePrice)
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("sitePrice");
-            entity.Property(e => e.SiteTime).HasColumnName("siteTime");
+            entity.Property(e => e.SiteTime)
+                .HasPrecision(0)
+                .HasColumnName("siteTime");
 
             entity.HasOne(d => d.Order).WithMany(p => p.TSorderDetails)
                 .HasForeignKey(d => d.OrderId)
@@ -890,13 +910,14 @@ public partial class diveShopperContext : DbContext
             entity.ToTable("tSsiteDetail");
 
             entity.Property(e => e.SiteId).HasColumnName("siteId");
+            entity.Property(e => e.Collect).HasColumnName("collect");
             entity.Property(e => e.Detail)
                 .IsRequired()
                 .HasColumnName("detail");
+            entity.Property(e => e.Evaluate).HasColumnName("evaluate");
             entity.Property(e => e.NumberOfPeople).HasColumnName("numberOfPeople");
-            entity.Property(e => e.SiteEmail)
-                .HasMaxLength(50)
-                .HasColumnName("siteEmail");
+            entity.Property(e => e.Photo).HasColumnName("photo");
+            entity.Property(e => e.SiteEmail).HasColumnName("siteEmail");
             entity.Property(e => e.SitePhone)
                 .HasMaxLength(50)
                 .HasColumnName("sitePhone");
@@ -904,8 +925,7 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("sitePrice");
             entity.Property(e => e.SiteSize)
-                .HasMaxLength(10)
-                .IsFixedLength()
+                .HasMaxLength(50)
                 .HasColumnName("siteSize");
             entity.Property(e => e.VenueAddress)
                 .HasMaxLength(50)

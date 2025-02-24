@@ -11,12 +11,6 @@ public partial class TCorder
 
     public int? MemberId { get; set; }
 
-    public int? CourseId { get; set; }
-
-    public decimal? CoursePrice { get; set; }
-
-    public int? Quantity { get; set; }
-
     public DateTime? OrderDate { get; set; }
 
     public virtual TMmemberList Member { get; set; }

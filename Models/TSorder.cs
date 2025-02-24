@@ -17,7 +17,7 @@ public partial class TSorder
 
     public DateOnly? SiteDay { get; set; }
 
-    public string SiteTime { get; set; }
+    public TimeOnly? SiteTime { get; set; }
 
     public decimal? SitePay { get; set; }
 
