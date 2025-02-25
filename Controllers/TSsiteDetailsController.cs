@@ -68,7 +68,11 @@ namespace diveWebAPI.Controllers
             tSsiteDetail.VenueAddress = tSsiteDetailDto.VenueAddress;
             tSsiteDetail.Detail = tSsiteDetailDto.Detail;
             tSsiteDetail.Evaluate = tSsiteDetailDto.Evaluate;
-            tSsiteDetail.Collect = tSsiteDetailDto.Collect;
+            tSsiteDetail.SitePrice = tSsiteDetailDto.SitePrice;
+            tSsiteDetail.SiteSize = tSsiteDetailDto.SiteSize;
+            tSsiteDetail.SitePhone = tSsiteDetailDto.SitePhone;
+            tSsiteDetail.SiteEmail = tSsiteDetailDto.SiteEmail;
+            
 
             _context.Entry(tSsiteDetail).State = EntityState.Modified;
 
@@ -114,6 +118,10 @@ namespace diveWebAPI.Controllers
             tSsiteDetail.Detail = tSsiteDetailDto.Detail;
             tSsiteDetail.Evaluate = tSsiteDetailDto.Evaluate;
             tSsiteDetail.Collect = tSsiteDetailDto.Collect;
+            tSsiteDetail.SitePrice = tSsiteDetailDto.SitePrice;
+            tSsiteDetail.SiteSize = tSsiteDetailDto.SiteSize;
+            tSsiteDetail.SitePhone = tSsiteDetailDto.SitePhone;
+            tSsiteDetail.SiteEmail = tSsiteDetailDto.SiteEmail;
 
             // 3. 處理照片上傳
             if (tSsiteDetailDto.Photo != null)
@@ -183,7 +191,11 @@ namespace diveWebAPI.Controllers
                 VenueAddress = dto.VenueAddress,
                 Detail = dto.Detail,
                 Evaluate = dto.Evaluate,
-                Collect = dto.Collect
+                Collect = dto.Collect,
+                SitePrice = dto.SitePrice,
+                SiteSize = dto.SiteSize,
+                SitePhone = dto.SitePhone,
+                SiteEmail = dto.SiteEmail,
             };
 
             // 處理上傳的圖片
