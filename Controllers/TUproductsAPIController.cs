@@ -26,21 +26,16 @@ namespace diveWebAPI.Controllers
         }
 
         // GET: api/TUproductsAPI
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<TUproduct>>> GetTUproducts()
-        //{
-        //    return await _context.TUproducts.ToListAsync();
-        //}
-        // GET: api/TUproductsAPI
         [HttpGet]
         public async Task<IEnumerable<TUproductsAllDTO>> GetTUproducts(
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 6,
+            [FromQuery] int pageSize = 8,
             [FromQuery] string? keyword = null,
             [FromQuery] int? categoryId = null)
         {
             var products = await _context.TUproducts
                 .Include(p => p.TUproductImages) // 載入商品圖片
+                .Include(p => p.Seller)
                 .Where(p => (bool)p.ProductStatus) // 只篩選 ProductStatus 為 true 的商品
                 .Where(p => string.IsNullOrEmpty(keyword) || p.ProductName.Contains(keyword) || p.ProductDescription.Contains(keyword)) // 關鍵字搜尋
                 .Where(p => !categoryId.HasValue || p.CategoryId == categoryId) // 篩選類別
@@ -53,7 +48,7 @@ namespace diveWebAPI.Controllers
             var productList = products.Select(p => new TUproductsAllDTO
             {
                 ProductId = p.UproductId,
-                SellerId = p.SellerId,
+                SellerName = p.Seller.MemberName,
                 CategoryId = p.CategoryId,
                 ProductName = p.ProductName,
                 ProductDescription = p.ProductDescription,
@@ -69,9 +64,9 @@ namespace diveWebAPI.Controllers
                         ? ConvertToThumbnailBase64(firstImage, 200, 200)
                         : null // 轉換圖片為縮圖
             });
-
             return productList;
         }
+       
         private string ConvertToThumbnailBase64(byte[] imageData, int width, int height)
         {
             using (var ms = new MemoryStream(imageData))
@@ -91,19 +86,6 @@ namespace diveWebAPI.Controllers
         }
 
 
-        // GET: api/TUproductsAPI/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<TUproduct>> GetTUproduct(int id)
-        //{
-        //    var tUproduct = await _context.TUproducts.FindAsync(id);
-
-        //    if (tUproduct == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return tUproduct;
-        //}
         // GET: api/TUproductsAPI/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TUproductsDetailDTO>> GetTUproduct(int id)
@@ -141,34 +123,7 @@ namespace diveWebAPI.Controllers
 
         // PUT: api/TUproductsAPI/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutTUproduct(int id, TUproduct tUproduct)
-        //{
-        //    if (id != tUproduct.UproductId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(tUproduct).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!TUproductExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTUproduct(int id, TUproductsDetailDTO tUproductDetailDTO)
         {
@@ -254,35 +209,16 @@ namespace diveWebAPI.Controllers
 
         // POST: api/TUproductsAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<TUproduct>> PostTUproduct(TUproduct tUproduct)
-        //{
-        //    _context.TUproducts.Add(tUproduct);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetTUproduct", new { id = tUproduct.UproductId }, tUproduct);
-        //}
+        
         [HttpPost]
         //[Authorize]
         public async Task<IActionResult> PostTUproduct(TUproductsDetailDTO uproductDetailDTO)
         {
-            // 取得目前登入的 UserId
-            //var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-            //var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            //if (string.IsNullOrEmpty(userIdClaim))
-            //{
-            //    Console.WriteLine("❌ 無法獲取 UserId，請檢查 JWT Token 是否正確傳遞");
-            //    return Unauthorized(new { message = "無效的 Token 或用戶未驗證" });
-            //}
-
-            //Console.WriteLine($"✅ 成功獲取 UserId: {userIdClaim}");
-
-            //var userId = int.Parse(userIdClaim);
             // 建立商品
             TUproduct uproduct = new TUproduct
             {
+                //SellerId = userId,
+
                 SellerId = uproductDetailDTO.SellerId,
                 ProductName = uproductDetailDTO.ProductName,
                 CategoryId = uproductDetailDTO.CategoryId,
@@ -319,26 +255,7 @@ namespace diveWebAPI.Controllers
 
 
         // DELETE: api/TUproductsAPI/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteTUproduct(int id)
-        //{
-        //    var tUproduct = await _context.TUproducts.FindAsync(id);
-        //    if (tUproduct == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _context.TUproducts.Remove(tUproduct);
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
-
-        //private bool TUproductExists(int id)
-        //{
-        //    return _context.TUproducts.Any(e => e.UproductId == id);
-        //}
-        // DELETE: api/TUproductsAPI/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTUproduct(int id)
         {
