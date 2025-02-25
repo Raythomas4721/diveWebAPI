@@ -23,6 +23,10 @@ public partial class TNorder
 
     public DateTime? CreatedDate { get; set; }
 
+    public DateTime? PaymentDate { get; set; }
+
+    public string MerchantTradeNo { get; set; }
+
     public virtual TMmemberList Member { get; set; }
 
     public virtual ICollection<TNorderDetail> TNorderDetails { get; set; } = new List<TNorderDetail>();

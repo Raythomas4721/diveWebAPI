@@ -27,8 +27,6 @@ public partial class diveShopperContext : DbContext
 
     public virtual DbSet<TCorder> TCorders { get; set; }
 
-    public virtual DbSet<TCorderDetail> TCorderDetails { get; set; }
-
     public virtual DbSet<TMadmin> TMadmins { get; set; }
 
     public virtual DbSet<TMcoach> TMcoaches { get; set; }
@@ -249,37 +247,24 @@ public partial class diveShopperContext : DbContext
             entity.ToTable("tCorders");
 
             entity.Property(e => e.OrderId).HasColumnName("orderId");
-            entity.Property(e => e.MemberId).HasColumnName("memberId");
-            entity.Property(e => e.OrderDate)
-                .HasColumnType("datetime")
-                .HasColumnName("orderDate");
-
-            entity.HasOne(d => d.Member).WithMany(p => p.TCorders)
-                .HasForeignKey(d => d.MemberId)
-                .HasConstraintName("FK_tCorders_tMmemberList");
-        });
-
-        modelBuilder.Entity<TCorderDetail>(entity =>
-        {
-            entity.HasKey(e => e.OrderDetailId);
-
-            entity.ToTable("tCorderDetails");
-
-            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
             entity.Property(e => e.CourseId).HasColumnName("courseId");
             entity.Property(e => e.CoursePrice)
                 .HasColumnType("money")
                 .HasColumnName("coursePrice");
-            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderDate)
+                .HasColumnType("datetime")
+                .HasColumnName("orderDate");
+            entity.Property(e => e.OrderStatus).HasColumnName("orderStatus");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
 
-            entity.HasOne(d => d.Course).WithMany(p => p.TCorderDetails)
+            entity.HasOne(d => d.Course).WithMany(p => p.TCorders)
                 .HasForeignKey(d => d.CourseId)
-                .HasConstraintName("FK_tCorderDetails_tCcourses");
+                .HasConstraintName("FK_tCorders_tCcourses");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.TCorderDetails)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_tCorderDetails_tCorders");
+            entity.HasOne(d => d.Member).WithMany(p => p.TCorders)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tCorders_tMmemberList");
         });
 
         modelBuilder.Entity<TMadmin>(entity =>
@@ -601,6 +586,10 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.StartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("startDate");
+
+            entity.HasOne(d => d.ProductCategory).WithMany(p => p.TNdiscounts)
+                .HasForeignKey(d => d.ProductCategoryId)
+                .HasConstraintName("FK_tNdiscount_tNproductCategory");
         });
 
         modelBuilder.Entity<TNgender>(entity =>
@@ -626,9 +615,11 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createdDate");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.MerchantTradeNo).HasMaxLength(50);
             entity.Property(e => e.OrderStatus)
                 .HasMaxLength(50)
                 .HasColumnName("orderStatus");
+            entity.Property(e => e.PaymentDate).HasColumnType("datetime");
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(50)
                 .HasColumnName("paymentMethod");
@@ -672,11 +663,6 @@ public partial class diveShopperContext : DbContext
             entity.HasOne(d => d.Productvariants).WithMany(p => p.TNorderDetails)
                 .HasForeignKey(d => d.ProductvariantsId)
                 .HasConstraintName("FK_tNorderDetail_tNproductvariants");
-
-            entity.HasOne(d => d.SubtotalNavigation).WithMany(p => p.TNorderDetails)
-                .HasForeignKey(d => d.Subtotal)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_tNorderDetail_tNdiscount");
         });
 
         modelBuilder.Entity<TNpicture>(entity =>

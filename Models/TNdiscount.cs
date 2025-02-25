@@ -19,5 +19,5 @@ public partial class TNdiscount
 
     public DateTime? EndDate { get; set; }
 
-    public virtual ICollection<TNorderDetail> TNorderDetails { get; set; } = new List<TNorderDetail>();
+    public virtual TNproductCategory ProductCategory { get; set; }
 }

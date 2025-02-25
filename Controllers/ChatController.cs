@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using diveWebAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace diveWebAPI.Controllers
 {
@@ -16,6 +17,8 @@ namespace diveWebAPI.Controllers
         private readonly diveShopperContext _context;
         private readonly string _azureEndpoint;
         private readonly string _apiKey;
+        // 用於儲存對話歷史
+        private static readonly Dictionary<string, List<object>> ConversationHistory = new Dictionary<string, List<object>>();
 
         public ChatController(HttpClient httpClient, diveShopperContext context, IConfiguration configuration)
         {
@@ -47,6 +50,11 @@ namespace diveWebAPI.Controllers
             if (!_context.TNproducts.Any())
                 return BadRequest("資料庫中沒有產品資料");
 
+            // 臨時使用固定 sessionId 測試上下文
+            string sessionId = "test-session"; // 固定值，模擬同一會話
+            if (!ConversationHistory.ContainsKey(sessionId))
+                ConversationHistory[sessionId] = new List<object>();
+
             // 抓產品資料
             var products = await _context.TNproducts
                 .Select(p => new
@@ -72,7 +80,7 @@ namespace diveWebAPI.Controllers
                 $"厚度: {string.Join(", ", p.Variants.Select(v => v.Thickness))}, " +
                 $"庫存: {string.Join(", ", p.Variants.Select(v => v.Stock))}"));
 
-            // 抓課程資料，分步處理
+            // 抓課程資料
             var allCourses = await _context.TCcourses
                 .Where(c => c.CourseStatus == true)
                 .Select(c => new
@@ -81,7 +89,7 @@ namespace diveWebAPI.Controllers
                     c.CoursePrice,
                     LevelName = c.Level.LevelName,
                     CoachName = c.Coach.CoachName,
-                    c.Discription,
+                    c.Discription, // 若應為 Description 請修正
                     c.StartAt,
                     Quota = c.CourseCategory.Quota
                 })
@@ -97,21 +105,21 @@ namespace diveWebAPI.Controllers
                 $"教練: {c.CoachName}, 描述: {c.Discription}, 開始時間: {c.StartAt:yyyy-MM-dd}, " +
                 $"總名額: {c.Quota}"));
 
-            var systemPrompt = $"你是一個潛水裝備與課程客服機器人，根據以下資料簡潔回答客戶關於價格、運送費、尺寸、顏色、性別、庫存、課程價格、總名額、課程難易度和開始日期的問題，並根據要求推薦適合的潛水裝備或課程（浮潛、自由潛水、水肺潛水）：\n" +
+            var systemPrompt = $"你是一個潛水裝備與課程客服機器人，根據以下資料和對話歷史簡潔回答客戶關於價格、運送費、尺寸、顏色、性別、庫存、課程價格、總名額、課程難易度和開始日期的問題，並根據要求推薦適合的潛水裝備或課程（浮潛、自由潛水、水肺潛水）：\n" +
                               $"產品資料：\n{productList}\n" +
                               $"課程資料（每類型挑選一個代表課程）：\n{courseList}\n" +
                               "規則：推薦課程時，優先選價格低或開始時間近的，適合自由潛水選相關課程或產品，回答簡短直接，避免冗長描述。\n" +
-                              "如果用戶說「想了解更多」且問題包含「課程」「課」「潛水課程」，回答「請前往我們的課程詳情頁了解更多：http://localhost:4200/#/courses」。\n" +
-                              "如果用戶說「想了解更多」且問題包含「商品」「裝備」「潛水裝備」，回答「請前往我們的商品頁了解更多：http://localhost:4200/#/shop」。\n" +
-                              "如果不知道答案或無法判斷，說「抱歉，我目前不知道，請問您想了解商品還是課程的哪方面？」。";
+                              "如果用戶說「想了解更多」，根據前文判斷：若提到「課程」「課」「潛水課程」，回答「請前往我們的課程詳情頁了解更多：http://localhost:4200/#/courses」；若提到「商品」「裝備」「潛水裝備」，回答「請前往我們的商品頁了解更多：http://localhost:4200/#/shop」；若無法判斷，說「請問您想了解商品還是課程的更多資訊？」。\n" +
+                              "如果不知道答案，說「抱歉，我目前不知道」。";
+
+            // 構建對話歷史
+            var messages = new List<object> { new { role = "system", content = systemPrompt } };
+            messages.AddRange(ConversationHistory[sessionId]);
+            messages.Add(new { role = "user", content = request.Message });
 
             var payload = new
             {
-                messages = new[]
-                {
-                    new { role = "system", content = systemPrompt },
-                    new { role = "user", content = request.Message }
-                },
+                messages = messages.ToArray(),
                 max_tokens = 200
             };
 
@@ -128,6 +136,13 @@ namespace diveWebAPI.Controllers
             {
                 var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseString);
                 var reply = jsonResponse.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
+
+                // 更新對話歷史
+                ConversationHistory[sessionId].Add(new { role = "user", content = request.Message });
+                ConversationHistory[sessionId].Add(new { role = "assistant", content = reply });
+                if (ConversationHistory[sessionId].Count > 10)
+                    ConversationHistory[sessionId] = ConversationHistory[sessionId].Skip(ConversationHistory[sessionId].Count - 10).ToList();
+
                 return Ok(new { Reply = reply });
             }
 
