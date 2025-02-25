@@ -14,9 +14,9 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TCordersController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
 
-        public TCordersController(diveShopperContext context)
+        public TCordersController(DiveShopperContext context)
         {
             _context = context;
         }

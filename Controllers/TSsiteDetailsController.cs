@@ -16,10 +16,10 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TSsiteDetailsController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
         private readonly IWebHostEnvironment _environment; // 注入 IWebHostEnvironment
 
-        public TSsiteDetailsController(diveShopperContext context, IWebHostEnvironment environment)
+        public TSsiteDetailsController(DiveShopperContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;
