@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace diveWebAPI.Models;
 
-public partial class DiveShopperContext : DbContext
+public partial class diveShopperContext : DbContext
 {
-    public DiveShopperContext(DbContextOptions<DiveShopperContext> options)
+    public diveShopperContext(DbContextOptions<diveShopperContext> options)
         : base(options)
     {
     }
@@ -584,7 +584,7 @@ public partial class DiveShopperContext : DbContext
             entity.Property(e => e.EndDate)
                 .HasColumnType("datetime")
                 .HasColumnName("endDate");
-            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
+            entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
             entity.Property(e => e.StartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("startDate");
@@ -853,7 +853,17 @@ public partial class DiveShopperContext : DbContext
 
             entity.Property(e => e.OrderId).HasColumnName("orderId");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.SiteDay).HasColumnName("siteDay");
             entity.Property(e => e.SiteId).HasColumnName("siteId");
+            entity.Property(e => e.SitePay)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("sitePay");
+            entity.Property(e => e.SiteTime)
+                .HasPrecision(0)
+                .HasColumnName("siteTime");
+            entity.Property(e => e.VenueName)
+                .HasMaxLength(50)
+                .HasColumnName("venueName");
 
             entity.HasOne(d => d.Member).WithMany(p => p.TSorders)
                 .HasForeignKey(d => d.MemberId)
@@ -871,14 +881,14 @@ public partial class DiveShopperContext : DbContext
             entity.ToTable("tSorderDetail");
 
             entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
-            entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.OrderId).HasColumnName("orderId");
-            entity.Property(e => e.ScheduleId)
-                .HasMaxLength(50)
-                .HasColumnName("scheduleId");
-            entity.Property(e => e.UnitPrice)
+            entity.Property(e => e.SiteDay).HasColumnName("siteDay");
+            entity.Property(e => e.SitePrice)
                 .HasColumnType("decimal(18, 0)")
-                .HasColumnName("unitPrice");
+                .HasColumnName("sitePrice");
+            entity.Property(e => e.SiteTime)
+                .HasPrecision(0)
+                .HasColumnName("siteTime");
 
             entity.HasOne(d => d.Order).WithMany(p => p.TSorderDetails)
                 .HasForeignKey(d => d.OrderId)
@@ -934,6 +944,16 @@ public partial class DiveShopperContext : DbContext
             entity.Property(e => e.Evaluate).HasColumnName("evaluate");
             entity.Property(e => e.NumberOfPeople).HasColumnName("numberOfPeople");
             entity.Property(e => e.Photo).HasColumnName("photo");
+            entity.Property(e => e.SiteEmail).HasColumnName("siteEmail");
+            entity.Property(e => e.SitePhone)
+                .HasMaxLength(50)
+                .HasColumnName("sitePhone");
+            entity.Property(e => e.SitePrice)
+                .HasColumnType("decimal(18, 0)")
+                .HasColumnName("sitePrice");
+            entity.Property(e => e.SiteSize)
+                .HasMaxLength(50)
+                .HasColumnName("siteSize");
             entity.Property(e => e.VenueAddress)
                 .HasMaxLength(50)
                 .HasColumnName("venueAddress");

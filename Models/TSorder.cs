@@ -13,6 +13,14 @@ public partial class TSorder
 
     public int? SiteId { get; set; }
 
+    public string VenueName { get; set; }
+
+    public DateOnly? SiteDay { get; set; }
+
+    public TimeOnly? SiteTime { get; set; }
+
+    public decimal? SitePay { get; set; }
+
     public virtual TMmemberList Member { get; set; }
 
     public virtual TSsiteDetail Site { get; set; }
