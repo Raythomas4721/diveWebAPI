@@ -14,13 +14,13 @@ namespace diveWebAPI.Controllers
     public class ChatController : ControllerBase
     {
         private readonly HttpClient _httpClient;
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
         private readonly string _azureEndpoint;
         private readonly string _apiKey;
         // 用於儲存對話歷史
         private static readonly Dictionary<string, List<object>> ConversationHistory = new Dictionary<string, List<object>>();
 
-        public ChatController(HttpClient httpClient, diveShopperContext context, IConfiguration configuration)
+        public ChatController(HttpClient httpClient, DiveShopperContext context, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _context = context;

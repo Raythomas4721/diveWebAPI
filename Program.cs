@@ -19,7 +19,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddDbContext<diveShopperContext>(options =>
+builder.Services.AddDbContext<DiveShopperContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DiveShopper"));
 });
