@@ -20,4 +20,5 @@ public partial class TNdiscount
     public DateTime? EndDate { get; set; }
 
     public virtual TNproductCategory ProductCategory { get; set; }
+    public int? ProductCategoryId { get; set; } 
 }
