@@ -21,6 +21,44 @@ namespace diveWebAPI.Controllers
             _context = context;
         }
 
+
+        // GET: api/TCorders/member/1026
+        [HttpGet("member/{memberId}")]
+        public async Task<ActionResult<IEnumerable<TCorderDTO>>> GetOrdersByMemberId(int memberId)
+        {
+            var orders = await _context.TCorders
+                .Where(o => o.MemberId == memberId)
+                .Include(o => o.Member) // 確保獲取會員資訊
+                .Include(o => o.Course)
+                .ThenInclude(c => c.CourseCategory) // 獲取課程類別
+                .Include(o => o.Course.Level) // 獲取課程等級
+                .Include(o => o.Course.Coach) // 獲取教練資訊
+                .Select(o => new TCorderDTO
+                {
+                    OrderId = o.OrderId,
+                    MemberId = o.MemberId,
+                    MemberName = o.Member.MemberName, // 確保會員名稱被載入
+                    CourseId = o.CourseId,
+                    CourseName = $"{o.Course.StartAt:MM/dd} {o.Course.CourseCategory.CategoryName} 體驗課程｜免費拍照｜免證照",
+                    CategoryName = o.Course.CourseCategory.CategoryName ?? "未分類",
+                    LevelName = o.Course.Level.LevelName ?? "無等級",
+                    CoachName = o.Course.Coach.CoachName ?? "無教練",
+                    CoursePrice = o.CoursePrice,
+                    Quantity = o.Quantity,
+                    OrderDate = o.OrderDate,
+                    OrderStatus = o.OrderStatus,
+                    StartAt = o.Course.StartAt
+                })
+                .ToListAsync();
+
+            if (!orders.Any())
+            {
+                return NotFound(new { message = "沒有找到該會員的訂單紀錄" });
+            }
+
+            return Ok(orders);
+        }
+
         // GET: api/TCorders
         [HttpGet]
         public async Task<IEnumerable<TCorderDTO>> GetTCorders()
@@ -35,6 +73,7 @@ namespace diveWebAPI.Controllers
                     MemberName = e.Member.MemberName,
                     CourseId = e.CourseId,
                     CourseName = $"{e.Course.StartAt:MM/dd}{e.Course.CourseCategory.CategoryName}體驗課程｜免費拍照｜免證照",
+                    CategoryName=e.Course.CourseCategory.CategoryName,
                     CoursePrice = e.CoursePrice,
                     Quantity = e.Quantity,
                     OrderDate = e.OrderDate,
@@ -121,24 +160,33 @@ namespace diveWebAPI.Controllers
         // POST: api/TCorders
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<String> PostTCorder(TCorderDTO orderDTO)
+        public async Task<IActionResult> PostTCorder(TCorderDTO orderDTO)
         {
             //int memberId = _context.TCcourseLevels.FirstOrDefault(e => e.== courseDTO.LevelName).LevelId;
 
             TCorder tcorder = new TCorder { 
+                //OrderId = 0,
+                //MemberId = orderDTO.MemberId,
+                //CourseId= orderDTO.CourseId,
+                //CoursePrice= orderDTO.CoursePrice,
+                //Quantity= orderDTO.Quantity,
+                //OrderDate= orderDTO.OrderDate, 
+                //OrderStatus=orderDTO.OrderStatus
                 OrderId = 0,
-                MemberId = orderDTO.MemberId,
-                CourseId= orderDTO.CourseId,
-                CoursePrice= orderDTO.CoursePrice,
-                Quantity= orderDTO.Quantity,
-                OrderDate= orderDTO.OrderDate,
-                OrderStatus=orderDTO.OrderStatus
+                MemberId = orderDTO.MemberId ?? 0,
+                CourseId = orderDTO.CourseId ?? 0,
+                CoursePrice = orderDTO.CoursePrice ?? 0,
+                Quantity = orderDTO.Quantity ?? 1,
+                OrderDate = orderDTO.OrderDate ?? DateTime.Now,
+                OrderStatus = orderDTO.OrderStatus ?? false
 
             };               
             _context.TCorders.Add(tcorder);
             await _context.SaveChangesAsync();
-            return $"訂單編號:{tcorder.OrderId}";
+            return Ok(new { message= $"訂單編號:{tcorder.OrderId}" });
         }
+
+        
 
         // DELETE: api/TCorders/5
         //[HttpDelete("{id}")]

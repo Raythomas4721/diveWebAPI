@@ -16,6 +16,7 @@ public partial class TCorder
     public decimal? CoursePrice { get; set; }
 
     public int? Quantity { get; set; }
+    public string? LevelName { get; set; }
 
     public DateTime? OrderDate { get; set; }
 
@@ -24,6 +25,7 @@ public partial class TCorder
     public virtual TCcourse Course { get; set; }
 
     public virtual TMmemberList Member { get; set; }
+    public virtual TCcourseLevel Level { get; set; }
 
     public virtual ICollection<TCcourseReview> TCcourseReviews { get; set; } = new List<TCcourseReview>();
 }

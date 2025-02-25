@@ -40,5 +40,6 @@ public partial class TCcourse
     public virtual ICollection<TCcourseReview> TCcourseReviews { get; set; } = new List<TCcourseReview>();
 
     public virtual ICollection<TCorder> TCorders { get; set; } = new List<TCorder>();
+    //public object CourseLevel { get; set; }
     //public object CourseName { get; set; }
 }
