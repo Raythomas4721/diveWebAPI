@@ -40,7 +40,8 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
-
+builder.Services.AddHttpClient();
+builder.Services.AddControllers();
 // ³]©w Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
@@ -147,5 +148,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();
