@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Azure.Core;
 using Microsoft.AspNetCore.Cors;
+using diveWebAPI.DTO;
 
 namespace diveWebAPI.Controllers
 {
@@ -89,18 +90,6 @@ namespace diveWebAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public class LoginRequestDTO
-        {
-            public string Email { get; set; }
-            public string Password { get; set; }
-        }
-
-        public class RegisterRequestDTO
-        {
-            public string Name { get; set; }
-            public string Email { get; set; }
-            public string Password { get; set; }
-        }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDTO request)
@@ -156,19 +145,8 @@ namespace diveWebAPI.Controllers
                 user
             });
         }
-
-        public class EditUserInfoDTO
-        {
-            public string? MemberName { get; set; }
-            public string? MemberPhone { get; set; }
-            public string? MemberAddress { get; set; }
-            public string? UrgentContact { get; set; }
-            public string? UrgentPhone { get; set; }
-
-        }
-        
         [Authorize]
-        [HttpPatch("UpdateUserInfo")]
+        [HttpPut("UpdateUserInfo")]
         public async Task<IActionResult> UpdateUserInfo([FromBody] EditUserInfoDTO request)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
@@ -200,6 +178,7 @@ namespace diveWebAPI.Controllers
                 return StatusCode(500, new { status = false, message = "更新使用者資訊時發生錯誤", error = ex.Message });
             };
         }
+
         //[Authorize]
         //[HttpPut("ChangeUserPhoto")]
         //[Consumes("multipart/form-data")]
@@ -254,12 +233,6 @@ namespace diveWebAPI.Controllers
         //        return StatusCode(500, new { status = false, message = "圖片上傳失敗", error = ex.Message });
         //    }
         //}
-        public class ChangePasswordDTO
-        {
-            public string CurrentPassword { get; set; }
-            public string NewPassword { get; set; }
-
-        }
         [Authorize]
         [HttpPut("changePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)

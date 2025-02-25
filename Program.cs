@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DiveShopperContext = diveWebAPI.Models.DiveShopperContext;
+using diveWebAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +19,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddDbContext<DiveShopperContext>(options =>
+builder.Services.AddDbContext<diveShopperContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DiveShopper"));
 });
@@ -40,7 +40,8 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
-
+builder.Services.AddHttpClient();
+builder.Services.AddControllers();
 // ³]©w Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
@@ -147,5 +148,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();
