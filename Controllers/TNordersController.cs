@@ -145,7 +145,10 @@ namespace diveWebAPI.Controllers
                     Subtotal = od.Subtotal
                 }).ToList()
             };
-
+            var allCartItems = _context.TNcartItems
+        .Where(ci => ci.MemberId == dto.MemberId);
+            _context.TNcartItems.RemoveRange(allCartItems);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSingleOrder), new { id = tNorder.OrderId }, orderDto);
         }
 
@@ -231,13 +234,13 @@ namespace diveWebAPI.Controllers
             string hashKey = _config["ECPay:HashKey"];
             string hashIV = _config["ECPay:HashIV"];
             string returnURL = _config["ECPay:ReturnURL"];       // 後端 Callback
-            string resultURL = _config["ECPay:OrderResultURL"];  // 前端顯示結果
+            string resultURL = _config["ECPay:ClientBackURL"];  // 前端顯示結果
 
             // 建議自訂的交易編號 (MerchantTradeNo) 確保唯一
             // 例如： "Order202302011530_123" or "TNorder_{orderId}_{ticks}"
 
             var merchantTradeDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
-
+            string ecpayResult = "http://localhost:4200/#/ecpayResult";
             // 對應綠界最基本的欄位 (更多欄位請參考官方文件)
             var parameters = new Dictionary<string, string>
     {
@@ -249,7 +252,7 @@ namespace diveWebAPI.Controllers
         { "TradeDesc", "DiveShopperOrder" },              // 交易描述
         { "ItemName", "1" },                         // 例如"ABC商品 x1"
         { "ReturnURL", returnURL },                        // 綠界背景通知
-        { "OrderResultURL", resultURL },                   // 付款後前端導頁
+        { "ClientBackURL",  $"{ecpayResult}?orderId={orderId}" },                   // 付款後前端導頁
         { "ChoosePayment", "Credit" },                        // 支援全部支付方式
         { "EncryptType", "1" }
     };
