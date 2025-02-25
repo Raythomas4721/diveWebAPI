@@ -29,6 +29,9 @@
 
         public DateTime? StartAt { get; set; }
 
-        public string Description { get; set; }  // 新增此欄位
+        public string Description { get; set; }  // 新增
+        public string Gender { get; set; } // 新增
+        public string Experience { get; set; }
+        public byte[] CoachPhoto { get; set; }
     }
 }

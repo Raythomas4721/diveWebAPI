@@ -27,8 +27,6 @@ public partial class DiveShopperContext : DbContext
 
     public virtual DbSet<TCorder> TCorders { get; set; }
 
-    public virtual DbSet<TCorderDetail> TCorderDetails { get; set; }
-
     public virtual DbSet<TMadmin> TMadmins { get; set; }
 
     public virtual DbSet<TMcoach> TMcoaches { get; set; }
@@ -115,6 +113,8 @@ public partial class DiveShopperContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Chinese_Taiwan_Stroke_CI_AS");
+
         modelBuilder.Entity<ProductStat>(entity =>
         {
             entity.HasNoKey();
@@ -249,37 +249,24 @@ public partial class DiveShopperContext : DbContext
             entity.ToTable("tCorders");
 
             entity.Property(e => e.OrderId).HasColumnName("orderId");
-            entity.Property(e => e.MemberId).HasColumnName("memberId");
-            entity.Property(e => e.OrderDate)
-                .HasColumnType("datetime")
-                .HasColumnName("orderDate");
-
-            entity.HasOne(d => d.Member).WithMany(p => p.TCorders)
-                .HasForeignKey(d => d.MemberId)
-                .HasConstraintName("FK_tCorders_tMmemberList");
-        });
-
-        modelBuilder.Entity<TCorderDetail>(entity =>
-        {
-            entity.HasKey(e => e.OrderDetailId);
-
-            entity.ToTable("tCorderDetails");
-
-            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
             entity.Property(e => e.CourseId).HasColumnName("courseId");
             entity.Property(e => e.CoursePrice)
                 .HasColumnType("money")
                 .HasColumnName("coursePrice");
-            entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderDate)
+                .HasColumnType("datetime")
+                .HasColumnName("orderDate");
+            entity.Property(e => e.OrderStatus).HasColumnName("orderStatus");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
 
-            entity.HasOne(d => d.Course).WithMany(p => p.TCorderDetails)
+            entity.HasOne(d => d.Course).WithMany(p => p.TCorders)
                 .HasForeignKey(d => d.CourseId)
-                .HasConstraintName("FK_tCorderDetails_tCcourses");
+                .HasConstraintName("FK_tCorders_tCcourses");
 
-            entity.HasOne(d => d.Order).WithMany(p => p.TCorderDetails)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_tCorderDetails_tCorders");
+            entity.HasOne(d => d.Member).WithMany(p => p.TCorders)
+                .HasForeignKey(d => d.MemberId)
+                .HasConstraintName("FK_tCorders_tMmemberList");
         });
 
         modelBuilder.Entity<TMadmin>(entity =>
@@ -597,7 +584,7 @@ public partial class DiveShopperContext : DbContext
             entity.Property(e => e.EndDate)
                 .HasColumnType("datetime")
                 .HasColumnName("endDate");
-            entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
+            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
             entity.Property(e => e.StartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("startDate");
