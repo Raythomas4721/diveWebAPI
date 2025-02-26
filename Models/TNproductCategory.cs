@@ -14,4 +14,6 @@ public partial class TNproductCategory
     public int? ParentCategoryId { get; set; }
 
     public string ImageFileName { get; set; }
+
+    public virtual ICollection<TNdiscount> TNdiscounts { get; set; } = new List<TNdiscount>();
 }

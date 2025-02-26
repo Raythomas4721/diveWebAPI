@@ -24,6 +24,4 @@ public partial class TNorderDetail
     public virtual TNorder Order { get; set; }
 
     public virtual TNproductvariant Productvariants { get; set; }
-
-    public virtual TNdiscount SubtotalNavigation { get; set; }
 }

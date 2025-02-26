@@ -162,31 +162,42 @@ namespace diveWebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostTCorder(TCorderDTO orderDTO)
         {
-            //int memberId = _context.TCcourseLevels.FirstOrDefault(e => e.== courseDTO.LevelName).LevelId;
+            try
+            {
+                if (!orderDTO.MemberId.HasValue || !orderDTO.CourseId.HasValue)
+                {
+                    return BadRequest(new { message = "MemberId 或 CourseId 不能為空" });
+                }
 
-            TCorder tcorder = new TCorder { 
-                //OrderId = 0,
-                //MemberId = orderDTO.MemberId,
-                //CourseId= orderDTO.CourseId,
-                //CoursePrice= orderDTO.CoursePrice,
-                //Quantity= orderDTO.Quantity,
-                //OrderDate= orderDTO.OrderDate, 
-                //OrderStatus=orderDTO.OrderStatus
-                OrderId = 0,
-                MemberId = orderDTO.MemberId ?? 0,
-                CourseId = orderDTO.CourseId ?? 0,
-                CoursePrice = orderDTO.CoursePrice ?? 0,
-                Quantity = orderDTO.Quantity ?? 1,
-                OrderDate = orderDTO.OrderDate ?? DateTime.Now,
-                OrderStatus = orderDTO.OrderStatus ?? false
+                // 建立訂單物件
+                TCorder tcorder = new TCorder
+                {
+                    OrderId = 0,
+                    MemberId = orderDTO.MemberId.Value,
+                    CourseId = orderDTO.CourseId.Value,
+                    CoursePrice = orderDTO.CoursePrice ?? 0,
+                    Quantity = orderDTO.Quantity ?? 1,
+                    OrderDate = orderDTO.OrderDate ?? DateTime.Now,
+                    OrderStatus = orderDTO.OrderStatus ?? false
+                };
 
-            };               
-            _context.TCorders.Add(tcorder);
-            await _context.SaveChangesAsync();
-            return Ok(new { message= $"訂單編號:{tcorder.OrderId}" });
+                _context.TCorders.Add(tcorder);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = $"訂單已建立，編號: {tcorder.OrderId}", orderId = tcorder.OrderId });
+            }
+            catch (DbUpdateException dbEx)
+            {
+                Console.WriteLine($"❌ 資料庫錯誤: {dbEx.InnerException?.Message ?? dbEx.Message}");
+                return StatusCode(500, new { message = $"資料庫錯誤: {dbEx.InnerException?.Message ?? dbEx.Message}" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ 訂單建立失敗: {ex.Message}");
+                return StatusCode(500, new { message = $"伺服器錯誤: {ex.Message}" });
+            }
         }
 
-        
 
         // DELETE: api/TCorders/5
         //[HttpDelete("{id}")]

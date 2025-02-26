@@ -1,6 +1,6 @@
 ﻿{
    "CodeGenerationMode": 4,
-   "ContextClassName": "DiveShopperContext",
+   "ContextClassName": "diveShopperContext",
    "ContextNamespace": null,
    "FilterSchemas": false,
    "IncludeConnectionString": false,
@@ -36,10 +36,6 @@
       },
       {
          "Name": "[dbo].[tCcourses]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[tCorderDetails]",
          "ObjectType": 0
       },
       {

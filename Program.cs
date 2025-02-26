@@ -35,11 +35,19 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.SetIsOriginAllowed(_ => true) 
+            policy.SetIsOriginAllowed(_ => true)
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll",
+//        policy => policy.AllowAnyOrigin()
+//                        .AllowAnyMethod()
+//                        .AllowAnyHeader());
+//});
 
 // ³]©w Identity
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>

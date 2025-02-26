@@ -584,10 +584,14 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.EndDate)
                 .HasColumnType("datetime")
                 .HasColumnName("endDate");
-            entity.Property(e => e.OrderDetailId).HasColumnName("orderDetailId");
+            entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
             entity.Property(e => e.StartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("startDate");
+
+            entity.HasOne(d => d.ProductCategory).WithMany(p => p.TNdiscounts)
+                .HasForeignKey(d => d.ProductCategoryId)
+                .HasConstraintName("FK_tNdiscount_tNproductCategory");
         });
 
         modelBuilder.Entity<TNgender>(entity =>
@@ -613,9 +617,11 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("createdDate");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.MerchantTradeNo).HasMaxLength(50);
             entity.Property(e => e.OrderStatus)
                 .HasMaxLength(50)
                 .HasColumnName("orderStatus");
+            entity.Property(e => e.PaymentDate).HasColumnType("datetime");
             entity.Property(e => e.PaymentMethod)
                 .HasMaxLength(50)
                 .HasColumnName("paymentMethod");
@@ -659,11 +665,6 @@ public partial class diveShopperContext : DbContext
             entity.HasOne(d => d.Productvariants).WithMany(p => p.TNorderDetails)
                 .HasForeignKey(d => d.ProductvariantsId)
                 .HasConstraintName("FK_tNorderDetail_tNproductvariants");
-
-            entity.HasOne(d => d.SubtotalNavigation).WithMany(p => p.TNorderDetails)
-                .HasForeignKey(d => d.Subtotal)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_tNorderDetail_tNdiscount");
         });
 
         modelBuilder.Entity<TNpicture>(entity =>
