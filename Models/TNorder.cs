@@ -25,7 +25,7 @@ public partial class TNorder
 
     public DateTime? PaymentDate { get; set; }
 
-    public string? MerchantTradeNo { get; set; }
+    public string MerchantTradeNo { get; set; }
 
     public virtual TMmemberList Member { get; set; }
 

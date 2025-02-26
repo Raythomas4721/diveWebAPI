@@ -39,10 +39,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[tCorderDetails]",
-         "ObjectType": 0
-      },
-      {
          "Name": "[dbo].[tCorders]",
          "ObjectType": 0
       },
