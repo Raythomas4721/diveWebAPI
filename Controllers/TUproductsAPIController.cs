@@ -150,10 +150,19 @@ namespace diveWebAPI.Controllers
             tUproduct.UpdatedAt = DateTime.Now;
             _context.Entry(tUproduct).State = EntityState.Modified;
 
+            // 確保圖片不包含 null
+            if (tUproductDetailDTO.TUproductImages != null)
+            {
+                tUproductDetailDTO.TUproductImages = tUproductDetailDTO.TUproductImages
+                    .Where(img => !string.IsNullOrEmpty(img))
+                    .ToArray();
+            }
+
             // 更新圖片邏輯
             if (tUproductDetailDTO.TUproductImages != null && tUproductDetailDTO.TUproductImages.Length > 0)
             {
-                var existingImage = tUproduct.TUproductImages.OrderBy(img => img.Uimage).ToList();
+                //var existingImage = tUproduct.TUproductImages.OrderBy(img => img.Uimage).ToList();
+                var existingImage = tUproduct.TUproductImages.OrderBy(img => img.ProductImagesId) .ToList();// 以 ProductImagesId 排序
                 for (int i = 0; i < tUproductDetailDTO.TUproductImages.Length; i++)
                 {
                     string base64Image = tUproductDetailDTO.TUproductImages[i];
@@ -181,6 +190,7 @@ namespace diveWebAPI.Controllers
                         }
                     }
                 }
+                // 刪除多餘圖片
                 if (existingImage.Count > tUproductDetailDTO.TUproductImages.Length)
                 {
                     var imagesToRemove = existingImage.Skip(tUproductDetailDTO.TUproductImages.Length).ToList();
