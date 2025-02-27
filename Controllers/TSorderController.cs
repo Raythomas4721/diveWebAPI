@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using diveWebAPI.Models;
+using diveWebAPI.Models.TSorderDTO;
 
 namespace diveWebAPI.Controllers
 {
@@ -72,11 +73,21 @@ namespace diveWebAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/TSorder
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //POST: api/TSorder
+        //To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<TSorder>> PostTSorder(TSorder tSorder)
+        public async Task<ActionResult<TSorder>> PostTSorder(TSorderCreateDTO tSorderCreateDTO)
         {
+            TSorder tSorder = new TSorder();
+            tSorder.MemberId = tSorderCreateDTO.MemberId;
+            tSorder.SiteId = tSorderCreateDTO.SiteId;
+            tSorder.SiteDay = tSorderCreateDTO.SiteDay;
+            tSorder.SiteTime = tSorderCreateDTO.SiteTime;
+            tSorder.SitePay = tSorderCreateDTO.SitePay;
+            tSorder.VenueName = tSorderCreateDTO.VenueName;
+
+
+
             _context.TSorders.Add(tSorder);
             await _context.SaveChangesAsync();
 

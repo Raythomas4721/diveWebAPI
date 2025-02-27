@@ -38,4 +38,6 @@ public partial class TCcourse
     public virtual ICollection<TCcourseFavorite> TCcourseFavorites { get; set; } = new List<TCcourseFavorite>();
 
     public virtual ICollection<TCcourseReview> TCcourseReviews { get; set; } = new List<TCcourseReview>();
+
+    public virtual ICollection<TCorder> TCorders { get; set; } = new List<TCorder>();
 }

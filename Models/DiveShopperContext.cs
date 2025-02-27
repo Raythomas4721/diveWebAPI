@@ -232,10 +232,20 @@ public partial class diveShopperContext : DbContext
             entity.ToTable("tCorders");
 
             entity.Property(e => e.OrderId).HasColumnName("orderId");
+            entity.Property(e => e.CourseId).HasColumnName("courseId");
+            entity.Property(e => e.CoursePrice)
+                .HasColumnType("money")
+                .HasColumnName("coursePrice");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
             entity.Property(e => e.OrderDate)
                 .HasColumnType("datetime")
                 .HasColumnName("orderDate");
+            entity.Property(e => e.OrderStatus).HasColumnName("orderStatus");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.TCorders)
+                .HasForeignKey(d => d.CourseId)
+                .HasConstraintName("FK_tCorders_tCcourses");
 
             entity.HasOne(d => d.Member).WithMany(p => p.TCorders)
                 .HasForeignKey(d => d.MemberId)
@@ -911,9 +921,7 @@ public partial class diveShopperContext : DbContext
 
             entity.Property(e => e.SiteId).HasColumnName("siteId");
             entity.Property(e => e.Collect).HasColumnName("collect");
-            entity.Property(e => e.Detail)
-                .IsRequired()
-                .HasColumnName("detail");
+            entity.Property(e => e.Detail).HasColumnName("detail");
             entity.Property(e => e.Evaluate).HasColumnName("evaluate");
             entity.Property(e => e.NumberOfPeople).HasColumnName("numberOfPeople");
             entity.Property(e => e.Photo).HasColumnName("photo");

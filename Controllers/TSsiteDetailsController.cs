@@ -32,6 +32,28 @@ namespace diveWebAPI.Controllers
             return await _context.TSsiteDetails.ToListAsync();
         }
 
+        // GET: api/TSsiteDetails/Search?keyword=yourKeyword
+        [HttpGet("Search")]
+        public async Task<ActionResult<IEnumerable<TSsiteDetail>>> SearchTSsiteDetails(string keyword)
+        {
+            if (string.IsNullOrEmpty(keyword))
+            {
+                return await GetTSsiteDetails(); // 如果沒有關鍵字，則回傳所有場地
+            }
+
+            // 使用關鍵字搜尋 VenueName 或 Detail 欄位
+            var results = await _context.TSsiteDetails
+                .Where(s => s.VenueName.Contains(keyword) || s.Detail.Contains(keyword))
+                .ToListAsync();
+
+            if (results == null || results.Count == 0)
+            {
+                return NotFound("找不到符合條件的場地。");
+            }
+
+            return results;
+        }
+
         // GET: api/TSsiteDetails/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TSsiteDetail>> GetTSsiteDetail(int id)
@@ -72,7 +94,7 @@ namespace diveWebAPI.Controllers
             tSsiteDetail.SiteSize = tSsiteDetailDto.SiteSize;
             tSsiteDetail.SitePhone = tSsiteDetailDto.SitePhone;
             tSsiteDetail.SiteEmail = tSsiteDetailDto.SiteEmail;
-            
+
 
             _context.Entry(tSsiteDetail).State = EntityState.Modified;
 
@@ -235,10 +257,5 @@ namespace diveWebAPI.Controllers
         {
             return _context.TSsiteDetails.Any(e => e.SiteId == id);
         }
-
-
     }
-
 }
-
-
