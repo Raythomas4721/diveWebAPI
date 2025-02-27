@@ -11,6 +11,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Microsoft.CodeAnalysis;
 
 namespace diveWebAPI.Controllers
 {
@@ -66,7 +67,7 @@ namespace diveWebAPI.Controllers
             });
             return productList;
         }
-       
+
         private string ConvertToThumbnailBase64(byte[] imageData, int width, int height)
         {
             using (var ms = new MemoryStream(imageData))
@@ -123,7 +124,7 @@ namespace diveWebAPI.Controllers
 
         // PUT: api/TUproductsAPI/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTUproduct(int id, TUproductsDetailDTO tUproductDetailDTO)
         {
@@ -162,7 +163,7 @@ namespace diveWebAPI.Controllers
             if (tUproductDetailDTO.TUproductImages != null && tUproductDetailDTO.TUproductImages.Length > 0)
             {
                 //var existingImage = tUproduct.TUproductImages.OrderBy(img => img.Uimage).ToList();
-                var existingImage = tUproduct.TUproductImages.OrderBy(img => img.ProductImagesId) .ToList();// 以 ProductImagesId 排序
+                var existingImage = tUproduct.TUproductImages.OrderBy(img => img.ProductImagesId).ToList();// 以 ProductImagesId 排序
                 for (int i = 0; i < tUproductDetailDTO.TUproductImages.Length; i++)
                 {
                     string base64Image = tUproductDetailDTO.TUproductImages[i];
@@ -219,7 +220,7 @@ namespace diveWebAPI.Controllers
 
         // POST: api/TUproductsAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        
+
         [HttpPost]
         //[Authorize]
         public async Task<IActionResult> PostTUproduct(TUproductsDetailDTO uproductDetailDTO)
@@ -263,9 +264,43 @@ namespace diveWebAPI.Controllers
             return Ok(new { message = "商品新增成功!" });
         }
 
+        [HttpPost("addCart")]
+        public async Task<IActionResult> AddCart([FromBody] TNaddcartDTO dto)
+        {
+            // 1) 找 variant
+            var product = await _context.TUproducts
+                .FirstOrDefaultAsync(v =>
+                    v.UproductId == dto.ProductId
+                );           
+            if (product == null)
+            {
+                return Ok(new { success = false, message = "無此變體" });
+
+            }
+
+            // 2) 庫存檢查
+
+
+            // 3) 從 variant 或 product 取得名/價
+            var productName = product.ProductName; // e.g. if variant has a navigation "Product"
+            var price = product.ProductPrice; // or variant.UnitPrice, or variant.Product.Price
+            var imageUrl = product.TUproductImages;
+
+
+            // 注意：**這裡就不進行購物車新增**，僅回傳成功 & 需要的資訊給前端
+            return Ok(new
+            {
+                success = true,
+                message = "已加入購物車",
+                product.UproductId,
+                price,
+                productName,
+                imageUrl
+            });
+        }
 
         // DELETE: api/TUproductsAPI/5
-        
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTUproduct(int id)
         {
