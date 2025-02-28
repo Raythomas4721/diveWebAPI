@@ -12,7 +12,7 @@ namespace diveWebAPI.Models.TSorderDTO
         public DateOnly? SiteDay { get; set; }
         public TimeOnly? SiteTime { get; set; }
         public decimal? SitePay { get; set; }
-      
+        
 
 
 

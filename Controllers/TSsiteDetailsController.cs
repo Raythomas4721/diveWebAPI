@@ -26,23 +26,54 @@ namespace diveWebAPI.Controllers
         }
         //讀取
         // GET: api/TSsiteDetails
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<TSsiteDetail>>> GetTSsiteDetails()
+        //{
+        //    return await _context.TSsiteDetails.ToListAsync();
+        //}
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TSsiteDetail>>> GetTSsiteDetails()
+        public async Task<ActionResult<IEnumerable<TSsiteDetail>>> GetTSsiteDetails(int region)
         {
-            return await _context.TSsiteDetails.ToListAsync();
-        }
+            IQueryable<TSsiteDetail> query = _context.TSsiteDetails;
 
+
+
+            // 根據區域篩選場地，這裡假設 VenueAddress 包含區域資訊
+            // 你可能需要調整篩選條件，以符合你的實際資料結構
+            if (region == 1)
+            {
+                query = query.Where(s => s.region == 1);
+            }
+            else if (region == 2)
+            {
+                query = query.Where(s => s.region == 2);
+            }
+            else if (region == 3)
+            {
+                query = query.Where(s => s.region == 3);
+            }
+            else if (region == 4)
+            {
+                query = query.Where(s => s.region == 4);
+            }
+            else 
+            {
+                query.ToList();
+                //return await query.ToListAsync();
+            }
+            return query.ToList();
+        }
         // GET: api/TSsiteDetails/Search?keyword=yourKeyword
         [HttpGet("Search")]
         public async Task<ActionResult<IEnumerable<TSsiteDetail>>> SearchTSsiteDetails(string keyword)
         {
             if (string.IsNullOrEmpty(keyword))
             {
-                return await GetTSsiteDetails(); // 如果沒有關鍵字，則回傳所有場地
+                return await GetTSsiteDetails(0); // 如果沒有關鍵字，則回傳所有場地
             }
 
-            // 使用關鍵字搜尋 VenueName 或 Detail 欄位
-            var results = await _context.TSsiteDetails
+            //使用關鍵字搜尋 VenueName 或 Detail 欄位
+           var results = await _context.TSsiteDetails
                 .Where(s => s.VenueName.Contains(keyword) || s.Detail.Contains(keyword))
                 .ToListAsync();
 

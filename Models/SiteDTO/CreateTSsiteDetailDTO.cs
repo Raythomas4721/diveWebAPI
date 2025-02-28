@@ -16,5 +16,6 @@
         public string? SitePhone { get; set; }
 
         public string? SiteEmail { get; set; }
+        public int? region { get; set; }
     }
 }
