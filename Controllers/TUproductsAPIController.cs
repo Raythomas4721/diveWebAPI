@@ -12,6 +12,7 @@ using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.CodeAnalysis;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace diveWebAPI.Controllers
 {
@@ -32,18 +33,51 @@ namespace diveWebAPI.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 8,
             [FromQuery] string? keyword = null,
-            [FromQuery] int? categoryId = null)
+            [FromQuery] int? categoryId = null,
+            [FromQuery] string? sort = null) // 新增排序參數
         {
-            var products = await _context.TUproducts
+            //var products = await _context.TUproducts
+            //    .Include(p => p.TUproductImages) // 載入商品圖片
+            //    .Include(p => p.Seller)
+            //    .Where(p => (bool)p.ProductStatus) // 只篩選 ProductStatus 為 true 的商品
+            //    .Where(p => string.IsNullOrEmpty(keyword) || p.ProductName.Contains(keyword) || p.ProductDescription.Contains(keyword)) // 關鍵字搜尋
+            //    .Where(p => !categoryId.HasValue || p.CategoryId == categoryId) // 篩選類別
+            //    .OrderByDescending(p => (p.UpdatedAt ?? p.CreatedAt)) // 依據最新的時間排序
+            //    .Skip((page - 1) * pageSize) // 分頁，跳過前面 (page - 1) * pageSize 筆
+            //    .Take(pageSize) // 取 pageSize 筆數據
+            //    .ToListAsync(); // 執行查詢
+                                // **先初始化 query**
+            var query = _context.TUproducts
                 .Include(p => p.TUproductImages) // 載入商品圖片
                 .Include(p => p.Seller)
                 .Where(p => (bool)p.ProductStatus) // 只篩選 ProductStatus 為 true 的商品
                 .Where(p => string.IsNullOrEmpty(keyword) || p.ProductName.Contains(keyword) || p.ProductDescription.Contains(keyword)) // 關鍵字搜尋
-                .Where(p => !categoryId.HasValue || p.CategoryId == categoryId) // 篩選類別
-                .OrderByDescending(p => (p.UpdatedAt ?? p.CreatedAt)) // 依據最新的時間排序
-                .Skip((page - 1) * pageSize) // 分頁，跳過前面 (page - 1) * pageSize 筆
-                .Take(pageSize) // 取 pageSize 筆數據
-                .ToListAsync(); // 執行查詢
+                .Where(p => !categoryId.HasValue || p.CategoryId == categoryId); // 篩選類別
+
+            // **加入排序邏輯**
+            switch (sort)
+            {
+                case "price-asc":
+                    query = query.OrderBy(p => p.ProductPrice);
+                    break;
+                case "price-desc":
+                    query = query.OrderByDescending(p => p.ProductPrice);
+                    break;
+                case "date-asc":
+                    query = query.OrderBy(p => p.CreatedAt);
+                    break;
+                case "date-desc":
+                default:
+                    query = query.OrderByDescending(p => (p.UpdatedAt ?? p.CreatedAt)); // 預設最新商品在前
+                    break;
+            }
+           
+
+            // **執行分頁並查詢資料**
+            var products = await query
+                .Skip((page - 1) * pageSize) // 分頁
+                .Take(pageSize) // 取指定筆數
+                .ToListAsync();
 
             // 在記憶體中處理圖片
             var productList = products.Select(p => new TUproductsAllDTO
