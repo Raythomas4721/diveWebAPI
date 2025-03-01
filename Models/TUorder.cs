@@ -17,6 +17,10 @@ public partial class TUorder
 
     public DateTime? OrderDate { get; set; }
 
+    public string PaymentMethod { get; set; }
+
+    public string OrderStatus { get; set; }
+
     public virtual TMmemberList Member { get; set; }
 
     public virtual ICollection<TUorderDetail> TUorderDetails { get; set; } = new List<TUorderDetail>();

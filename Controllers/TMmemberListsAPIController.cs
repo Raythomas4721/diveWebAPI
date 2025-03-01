@@ -18,6 +18,7 @@ using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Azure.Core;
 using Microsoft.AspNetCore.Cors;
 using diveWebAPI.DTO;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace diveWebAPI.Controllers
 {
@@ -44,7 +45,10 @@ namespace diveWebAPI.Controllers
                     u.MemberPassword,
                     u.RecentLogin
                 }).FirstOrDefaultAsync();
-
+            if (userData == null)
+            {
+                return BadRequest(new { status = false, message = "此電子郵件尚未註冊，請確認拼寫是否正確，或註冊一個新帳號。" });
+            }
             if (userData == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, userData.MemberPassword))
             {
                 return Unauthorized(new { status = false, message = "帳號或密碼錯誤" });

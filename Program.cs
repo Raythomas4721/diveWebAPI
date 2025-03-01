@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using diveWebAPI.Models;
+using diveWebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +87,10 @@ builder.Services.AddAuthentication(options =>
 
     googleOptions.ClaimActions.MapJsonKey("picture", "picture", "url");
     });
+
+// 註冊 Email 服務
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // 啟用授權
 builder.Services.AddAuthorization();

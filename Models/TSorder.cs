@@ -7,11 +7,23 @@ namespace diveWebAPI.Models;
 
 public partial class TSorder
 {
-    public int? MemberId { get; set; }
-
     public int OrderId { get; set; }
 
+    public int? MemberId { get; set; }
+
     public int? SiteId { get; set; }
+
+    public string VenueName { get; set; }
+
+    public DateOnly? SiteDay { get; set; }
+
+    public TimeOnly? SiteTime { get; set; }
+
+    public decimal? SitePay { get; set; }
+
+    public string PaymentMethod { get; set; }
+
+    public string OrderStatus { get; set; }
 
     public virtual TMmemberList Member { get; set; }
 
