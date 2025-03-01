@@ -69,8 +69,11 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
         ValidIssuer = "diveShopper",
         ValidAudience = "diveShopperClient",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq")),
+            // 確保 `userId` 被當作 NameIdentifier
+            NameClaimType = "userId"
         };
+
 })
 .AddGoogle(googleOptions =>
 {

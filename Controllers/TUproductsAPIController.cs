@@ -154,6 +154,57 @@ namespace diveWebAPI.Controllers
 
             return Ok(productDTO);
         }
+        [HttpGet("myProducts")]
+        [Authorize]
+        public async Task<IActionResult> GetMyProducts()
+        {
+            // 確保用戶已登入
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized(new { message = "未授權，請先登入" });
+            }
+
+            // 取得 `userId`
+            var userIdClaim = User.FindFirst("userId");
+
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                return Unauthorized(new { message = "無法獲取用戶 ID，請重新登入" });
+            }
+
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return BadRequest(new { message = "用戶 ID 格式錯誤" });
+            }
+
+            // 查詢當前會員商品
+            var myProducts = await _context.TUproducts
+                .Where(p => p.SellerId == userId)
+                .Include(p => p.TUproductImages)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            var productListDTO = myProducts.Select(p => new TUproductsListDTO
+            {
+                ProductId = p.UproductId,
+                SellerId = p.SellerId,
+                CategoryId = p.CategoryId,
+                ProductName = p.ProductName,
+                ProductDescription = p.ProductDescription,
+                ProductPrice = p.ProductPrice,
+                UpdatedAt = p.UpdatedAt,
+                CreatedAt = p.CreatedAt,
+                ProductConditionId = p.ProductConditionId,
+                ProductStatus = p.ProductStatus,
+                TUproductImages = p.TUproductImages
+                    .OrderBy(img => img.ProductImagesId)
+                    .Select(img => img.Uimage)
+                    .FirstOrDefault() is byte[] firstImage
+                        ? ConvertToThumbnailBase64(firstImage, 200, 200)
+                        : null
+            });
+            return Ok(productListDTO);
+        }
 
 
         // PUT: api/TUproductsAPI/5
