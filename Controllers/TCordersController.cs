@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using diveWebAPI.Models;
 using diveWebAPI.DTO;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using System.Text.Json;
 
 namespace diveWebAPI.Controllers
 {
@@ -23,6 +25,47 @@ namespace diveWebAPI.Controllers
 
 
         // GET: api/TCorders/member/1026
+        [HttpGet("memberLatestOrder/{memberId}")]
+        public async Task<ActionResult<IEnumerable<TCorderDTO>>> GetLatestOrderByMemberId(int memberId)
+        {
+            var order = await _context.TCorders
+                .Where(o => o.MemberId == memberId)
+                .Include(o => o.Member) // 確保獲取會員資訊
+                .Include(o => o.Course)
+                .ThenInclude(c => c.CourseCategory) // 獲取課程類別
+                .Include(o => o.Course.Level) // 獲取課程等級
+                .Include(o => o.Course.Coach) // 獲取教練資訊
+                .OrderByDescending(o => o.OrderDate)  // ✅ 按 OrderDate 降序排序，確保最新訂單排在最前
+                .FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                return NotFound(new { message = "沒有找到該會員的訂單紀錄" });
+            }
+
+
+            var orderDTO = new TCorderDTO   
+                {
+                    OrderId = order.OrderId,
+                    MemberId = order.MemberId,
+                    MemberName = order.Member.MemberName, // 確保會員名稱被載入
+                    CourseId = order.CourseId,
+                    CourseName = $"{order.Course.StartAt:MM/dd} {order.Course.CourseCategory.CategoryName} 體驗課程｜免費拍照｜免證照",
+                    //Photo = order.Course != null ? order.Course.Photo : null, // 用CourseId取得取得課程圖片
+                    Photo = order.Course.Photo != null ? Convert.ToBase64String(order.Course.Photo) : null,
+                    CategoryName = order.Course.CourseCategory.CategoryName ?? "未分類",
+                    LevelName = order.Course.Level.LevelName ?? "無等級",
+                    CoachName = order.Course.Coach.CoachName ?? "無教練",
+                    CoursePrice = order.CoursePrice,
+                    Quantity = order.Quantity,
+                    OrderDate = order.OrderDate,
+                    OrderStatus = order.OrderStatus,
+                    StartAt = order.Course.StartAt
+                };
+            return Ok(orderDTO);
+        }
+
+        // GET: api/TCorders/member/1026
         [HttpGet("member/{memberId}")]
         public async Task<ActionResult<IEnumerable<TCorderDTO>>> GetOrdersByMemberId(int memberId)
         {
@@ -33,13 +76,16 @@ namespace diveWebAPI.Controllers
                 .ThenInclude(c => c.CourseCategory) // 獲取課程類別
                 .Include(o => o.Course.Level) // 獲取課程等級
                 .Include(o => o.Course.Coach) // 獲取教練資訊
+                .OrderByDescending(o => o.OrderDate)  // ✅ 按 OrderDate 降序排序，確保最新訂單排在最前
                 .Select(o => new TCorderDTO
                 {
                     OrderId = o.OrderId,
                     MemberId = o.MemberId,
                     MemberName = o.Member.MemberName, // 確保會員名稱被載入
-                    CourseId = o.CourseId,
+                    CourseId = o.CourseId,                    
                     CourseName = $"{o.Course.StartAt:MM/dd} {o.Course.CourseCategory.CategoryName} 體驗課程｜免費拍照｜免證照",
+                    //Photo = o.Course != null ? o.Course.Photo : null, // 用CourseId取得取得課程圖片
+                    Photo = o.Course.Photo != null ? Convert.ToBase64String(o.Course.Photo) : null, // 🚀 轉換 Base64
                     CategoryName = o.Course.CourseCategory.CategoryName ?? "未分類",
                     LevelName = o.Course.Level.LevelName ?? "無等級",
                     CoachName = o.Course.Coach.CoachName ?? "無教練",
@@ -49,7 +95,7 @@ namespace diveWebAPI.Controllers
                     OrderStatus = o.OrderStatus,
                     StartAt = o.Course.StartAt
                 })
-                .ToListAsync();
+                .ToListAsync(); 
 
             if (!orders.Any())
             {
@@ -81,14 +127,16 @@ namespace diveWebAPI.Controllers
                 });
         }
 
+        
+
         // PUT: api/TCorders/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<string> PutTCorder(int id, TCorderDTO orderDTO)
+        public async Task<IActionResult> PutTCorder(int id, TCorderDTO orderDTO)
         {
             if (id != orderDTO.OrderId)
             {
-                return "修改訂單失敗";
+                return NotFound(new { message = "修改訂單失敗" });
             }
             int memberId = _context.TMmemberLists.FirstOrDefault(e => e.MemberName == orderDTO.MemberName).MemberId;
             TCorder tCorder = await _context.TCorders.FindAsync(id);
@@ -108,7 +156,7 @@ namespace diveWebAPI.Controllers
             {
                 if (!TCorderExists(id))
                 {
-                    return "修改訂單資料庫失敗";
+                    return BadRequest() ;
                 }
                 else
                 {
@@ -116,7 +164,7 @@ namespace diveWebAPI.Controllers
                 }
             }
 
-            return $"修改訂單{id}成功";
+            return Ok(new { message = $"修改訂單{id}成功" }) ;
         }
 
         private bool TCorderExists(int id)
@@ -177,7 +225,8 @@ namespace diveWebAPI.Controllers
                     CourseId = orderDTO.CourseId.Value,
                     CoursePrice = orderDTO.CoursePrice ?? 0,
                     Quantity = orderDTO.Quantity ?? 1,
-                    OrderDate = orderDTO.OrderDate ?? DateTime.Now,
+                    //OrderDate = orderDTO.OrderDate ?? DateTime.Now,
+                    OrderDate = orderDTO.OrderDate ?? DateTime.UtcNow,
                     OrderStatus = orderDTO.OrderStatus ?? false
                 };
 
