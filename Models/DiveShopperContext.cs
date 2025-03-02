@@ -13,6 +13,8 @@ public partial class DiveShopperContext : DbContext
     {
     }
 
+    public virtual DbSet<ProductStat> ProductStats { get; set; }
+
     public virtual DbSet<TCcourse> TCcourses { get; set; }
 
     public virtual DbSet<TCcourseCategory> TCcourseCategories { get; set; }
@@ -107,8 +109,21 @@ public partial class DiveShopperContext : DbContext
 
     public virtual DbSet<TUreview> TUreviews { get; set; }
 
+    public virtual DbSet<UserBehaviorLog> UserBehaviorLogs { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ProductStat>(entity =>
+        {
+            entity.HasNoKey();
+
+            entity.Property(e => e.CartCount).HasColumnName("cartCount");
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ProductId).HasColumnName("productId");
+            entity.Property(e => e.PurchaseCount).HasColumnName("purchaseCount");
+            entity.Property(e => e.ViewCount).HasColumnName("viewCount");
+        });
+
         modelBuilder.Entity<TCcourse>(entity =>
         {
             entity.HasKey(e => e.CourseId);
@@ -1146,6 +1161,34 @@ public partial class DiveShopperContext : DbContext
             entity.HasOne(d => d.OrderDetails).WithMany(p => p.TUreviews)
                 .HasForeignKey(d => d.OrderDetailsId)
                 .HasConstraintName("FK_tUreviews_tUorderDetails");
+        });
+
+        modelBuilder.Entity<UserBehaviorLog>(entity =>
+        {
+            entity.HasKey(e => e.LogId);
+
+            entity.ToTable("UserBehaviorLog");
+
+            entity.Property(e => e.LogId).HasColumnName("logId");
+            entity.Property(e => e.CreationDate)
+                .HasColumnType("datetime")
+                .HasColumnName("creationDate");
+            entity.Property(e => e.DwellTime).HasColumnName("dwellTime");
+            entity.Property(e => e.EventTime)
+                .HasColumnType("datetime")
+                .HasColumnName("eventTime");
+            entity.Property(e => e.EventType)
+                .HasMaxLength(50)
+                .HasColumnName("eventType");
+            entity.Property(e => e.ExtraData)
+                .HasMaxLength(50)
+                .HasColumnName("extraData");
+            entity.Property(e => e.GuestId).HasColumnName("guestId");
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(50)
+                .HasColumnName("ipAddress");
+            entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.ProductId).HasColumnName("productId");
         });
 
         OnModelCreatingPartial(modelBuilder);

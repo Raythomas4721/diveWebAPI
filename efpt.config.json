@@ -15,6 +15,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[ProductStats]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[tCcourseCategory]",
          "ObjectType": 0
       },
@@ -201,6 +205,10 @@
       {
          "Name": "[dbo].[tUreviews]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserBehaviorLog]",
+         "ObjectType": 0
       }
    ],
    "UiHint": null,
@@ -216,6 +224,7 @@
    "UseHandleBars": false,
    "UseHierarchyId": false,
    "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
    "UseLegacyPluralizer": false,
    "UseManyToManyEntity": false,
    "UseNoDefaultConstructor": false,
