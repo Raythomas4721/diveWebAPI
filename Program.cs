@@ -18,6 +18,7 @@ builder.Services.AddDbContext<diveShopperContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(

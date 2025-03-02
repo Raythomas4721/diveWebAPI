@@ -9,6 +9,7 @@ using diveWebAPI.Models;
 using diveWebAPI.Models.SiteDTO;
 using Microsoft.AspNetCore.Hosting; // 引入 IWebHostEnvironment
 using System.IO;
+using System.Text.Json;
 
 namespace diveWebAPI.Controllers
 {
@@ -18,11 +19,14 @@ namespace diveWebAPI.Controllers
     {
         private readonly diveShopperContext _context;
         private readonly IWebHostEnvironment _environment; // 注入 IWebHostEnvironment
+        private readonly IHttpClientFactory _clientFactory; // 注入 IHttpClientFactory
+        private readonly string CWA_API_KEY = "CWA-1335697B-71F0-4EF6-94C4-9CF794DE7055"; // 你的氣象署授權碼
 
-        public TSsiteDetailsController(diveShopperContext context, IWebHostEnvironment environment)
+        public TSsiteDetailsController(diveShopperContext context, IWebHostEnvironment environment, IHttpClientFactory clientFactory)
         {
             _context = context;
             _environment = environment;
+            _clientFactory = clientFactory;
         }
         //讀取
         // GET: api/TSsiteDetails
@@ -63,6 +67,10 @@ namespace diveWebAPI.Controllers
             }
             return query.ToList();
         }
+
+
+
+
         // GET: api/TSsiteDetails/Search?keyword=yourKeyword
         [HttpGet("Search")]
         public async Task<ActionResult<IEnumerable<TSsiteDetail>>> SearchTSsiteDetails(string keyword)
@@ -125,6 +133,7 @@ namespace diveWebAPI.Controllers
             tSsiteDetail.SiteSize = tSsiteDetailDto.SiteSize;
             tSsiteDetail.SitePhone = tSsiteDetailDto.SitePhone;
             tSsiteDetail.SiteEmail = tSsiteDetailDto.SiteEmail;
+            tSsiteDetail.region = tSsiteDetailDto.region;
 
 
             _context.Entry(tSsiteDetail).State = EntityState.Modified;
@@ -175,6 +184,8 @@ namespace diveWebAPI.Controllers
             tSsiteDetail.SiteSize = tSsiteDetailDto.SiteSize;
             tSsiteDetail.SitePhone = tSsiteDetailDto.SitePhone;
             tSsiteDetail.SiteEmail = tSsiteDetailDto.SiteEmail;
+            tSsiteDetail.region = tSsiteDetailDto.region;
+
 
             // 3. 處理照片上傳
             if (tSsiteDetailDto.Photo != null)
@@ -249,6 +260,7 @@ namespace diveWebAPI.Controllers
                 SiteSize = dto.SiteSize,
                 SitePhone = dto.SitePhone,
                 SiteEmail = dto.SiteEmail,
+                region=dto.region,
             };
 
             // 處理上傳的圖片
@@ -288,5 +300,108 @@ namespace diveWebAPI.Controllers
         {
             return _context.TSsiteDetails.Any(e => e.SiteId == id);
         }
+
+        //[HttpGet("Area")]
+        //public async Task<ActionResult<IEnumerable<TSsiteDetail>>> GetTSsiteDetailsarea(int area)
+        //{
+        //    IQueryable<TSsiteDetail> query = _context.TSsiteDetails;
+
+        //    switch (area)
+        //    {
+        //        case 1:
+        //            query = query.Where(s => s.area == 1); // 台北
+        //            break;
+        //        case 2:
+        //            query = query.Where(s => s.area == 2); // 新北
+        //            break;
+        //        default:
+        //            // 如果 region 值不是 1 或 2，則回傳所有資料
+        //            break;
+        //    }
+
+        //    return await query.ToListAsync();
+        //}
+        [HttpGet("Weather")]
+        public async Task<ActionResult<WeatherInfo>> GetWeather(string city)
+        {
+            if (string.IsNullOrEmpty(city))
+            {
+                return BadRequest("City parameter is required.");
+            }
+
+            try
+            {
+                // 呼叫中央氣象局 API
+                var weatherInfo = await GetWeatherFromCWA(city);
+                if (weatherInfo == null)
+                {
+                    return NotFound("Weather information not found for the specified city.");
+                }
+                return Ok(weatherInfo);
+            }
+            catch (Exception ex)
+            {
+                // 記錄錯誤訊息
+                Console.WriteLine($"Error fetching weather data: {ex.Message}");
+                return StatusCode(500, "Failed to retrieve weather information.");
+            }
+        }
+        private async Task<WeatherInfo> GetWeatherFromCWA(string city)
+        {
+            // 氣象局API網址 (假設你想獲取的是"一般天氣預報-今明 36 小時天氣預報")
+            string apiUrl = $"https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization={CWA_API_KEY}&format=JSON&locationName={city}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+            var client = _clientFactory.CreateClient(); // 使用 IHttpClientFactory 建立 HttpClient
+
+            var response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                using (var responseStream = await response.Content.ReadAsStreamAsync())
+                {
+                    // 使用 System.Text.Json 來解析 JSON
+                    var document = await JsonDocument.ParseAsync(responseStream);
+                    var locations = document.RootElement.GetProperty("records").GetProperty("location");
+
+                    // 找到對應城市的天氣資料
+                    foreach (var location in locations.EnumerateArray())
+                    {
+                        if (location.GetProperty("locationName").GetString() == city)
+                        {
+                            var weatherElement = location.GetProperty("weatherElement");
+                            var minTemp = weatherElement[2].GetProperty("time")[0].GetProperty("parameter").GetProperty("parameterName").GetString();
+                            var maxTemp = weatherElement[4].GetProperty("time")[0].GetProperty("parameter").GetProperty("parameterName").GetString();
+                            var condition = weatherElement[0].GetProperty("time")[0].GetProperty("parameter").GetProperty("parameterName").GetString();
+
+                            // 建立 WeatherInfo 物件
+                            var weatherInfo = new WeatherInfo
+                            {
+                                City = city,
+                                Temperature = $"{minTemp}°C - {maxTemp}°C",
+                                Condition = condition
+                            };
+                            return weatherInfo;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // 記錄錯誤訊息
+                Console.WriteLine($"CWA API request failed with status code: {response.StatusCode}");
+                return null;
+            }
+            return null;
+        }
+    }
+    // 定義一個簡單的天氣資訊類別
+    public class WeatherInfo
+    {
+        public string City { get; set; }
+        public string Temperature { get; set; }
+        public string Condition { get; set; }
     }
 }
+    
+

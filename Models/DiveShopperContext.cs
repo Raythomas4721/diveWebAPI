@@ -241,6 +241,9 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("orderDate");
             entity.Property(e => e.OrderStatus).HasColumnName("orderStatus");
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .HasColumnName("paymentMethod");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
 
             entity.HasOne(d => d.Course).WithMany(p => p.TCorders)
@@ -836,6 +839,12 @@ public partial class diveShopperContext : DbContext
 
             entity.Property(e => e.OrderId).HasColumnName("orderId");
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.OrderStatus)
+                .HasMaxLength(50)
+                .HasColumnName("orderStatus");
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .HasColumnName("paymentMethod");
             entity.Property(e => e.SiteDay).HasColumnName("siteDay");
             entity.Property(e => e.SiteId).HasColumnName("siteId");
             entity.Property(e => e.SitePay)
@@ -968,7 +977,13 @@ public partial class diveShopperContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("orderDate");
             entity.Property(e => e.OrderLogId).HasColumnName("orderLogId");
+            entity.Property(e => e.OrderStatus)
+                .HasMaxLength(50)
+                .HasColumnName("orderStatus");
             entity.Property(e => e.OrderStatusId).HasColumnName("orderStatusId");
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .HasColumnName("paymentMethod");
 
             entity.HasOne(d => d.Member).WithMany(p => p.TUorders)
                 .HasForeignKey(d => d.MemberId)
