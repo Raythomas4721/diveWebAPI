@@ -26,7 +26,13 @@ namespace diveWebAPI.DTO
         public bool? ProductStatus { get; set; }
 
         //public string[] TUproductImages { get; set; }
-        public string[] TUproductImages { get; set; } = Array.Empty<string>();
-
+        //public string[] TUproductImages { get; set; } = Array.Empty<string>();
+        // 確保圖片列表為空陣列而非 null
+        private string[] _tUproductImages = Array.Empty<string>();
+        public string[] TUproductImages
+        {
+            get => _tUproductImages;
+            set => _tUproductImages = value ?? Array.Empty<string>(); // 防止 null
+        }
     }
 }
