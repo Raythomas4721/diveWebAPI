@@ -88,7 +88,7 @@ namespace diveWebAPI.Controllers
                 PaymentMethod = dto.PaymentMethod,
                 ShipAddress = dto.ShipAddress,
                 ShipPhone = dto.ShipPhone,
-                OrderStatus = "Pending",  // 或預設 "New" / "Processing"
+                OrderStatus = "Processing",  // 或預設 "New" / "Processing"
                 CreatedDate = DateTime.Now
             };
 
