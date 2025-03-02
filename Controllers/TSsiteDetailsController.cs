@@ -17,12 +17,12 @@ namespace diveWebAPI.Controllers
     [ApiController]
     public class TSsiteDetailsController : ControllerBase
     {
-        private readonly diveShopperContext _context;
+        private readonly DiveShopperContext _context;
         private readonly IWebHostEnvironment _environment; // 注入 IWebHostEnvironment
         private readonly IHttpClientFactory _clientFactory; // 注入 IHttpClientFactory
         private readonly string CWA_API_KEY = "CWA-1335697B-71F0-4EF6-94C4-9CF794DE7055"; // 你的氣象署授權碼
 
-        public TSsiteDetailsController(diveShopperContext context, IWebHostEnvironment environment, IHttpClientFactory clientFactory)
+        public TSsiteDetailsController(DiveShopperContext context, IWebHostEnvironment environment, IHttpClientFactory clientFactory)
         {
             _context = context;
             _environment = environment;
@@ -46,19 +46,19 @@ namespace diveWebAPI.Controllers
             // 你可能需要調整篩選條件，以符合你的實際資料結構
             if (region == 1)
             {
-                query = query.Where(s => s.region == 1);
+                query = query.Where(s => s.Region == 1);
             }
             else if (region == 2)
             {
-                query = query.Where(s => s.region == 2);
+                query = query.Where(s => s.Region == 2);
             }
             else if (region == 3)
             {
-                query = query.Where(s => s.region == 3);
+                query = query.Where(s => s.Region == 3);
             }
             else if (region == 4)
             {
-                query = query.Where(s => s.region == 4);
+                query = query.Where(s => s.Region == 4);
             }
             else 
             {
@@ -133,7 +133,7 @@ namespace diveWebAPI.Controllers
             tSsiteDetail.SiteSize = tSsiteDetailDto.SiteSize;
             tSsiteDetail.SitePhone = tSsiteDetailDto.SitePhone;
             tSsiteDetail.SiteEmail = tSsiteDetailDto.SiteEmail;
-            tSsiteDetail.region = tSsiteDetailDto.region;
+            tSsiteDetail.Region = tSsiteDetailDto.region;
 
 
             _context.Entry(tSsiteDetail).State = EntityState.Modified;
@@ -184,7 +184,7 @@ namespace diveWebAPI.Controllers
             tSsiteDetail.SiteSize = tSsiteDetailDto.SiteSize;
             tSsiteDetail.SitePhone = tSsiteDetailDto.SitePhone;
             tSsiteDetail.SiteEmail = tSsiteDetailDto.SiteEmail;
-            tSsiteDetail.region = tSsiteDetailDto.region;
+            tSsiteDetail.Region = tSsiteDetailDto.region;
 
 
             // 3. 處理照片上傳
@@ -260,7 +260,7 @@ namespace diveWebAPI.Controllers
                 SiteSize = dto.SiteSize,
                 SitePhone = dto.SitePhone,
                 SiteEmail = dto.SiteEmail,
-                region=dto.region,
+                Region = dto.region,
             };
 
             // 處理上傳的圖片

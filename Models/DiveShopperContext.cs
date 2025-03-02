@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace diveWebAPI.Models;
 
-public partial class diveShopperContext : DbContext
+public partial class DiveShopperContext : DbContext
 {
-    public diveShopperContext(DbContextOptions<diveShopperContext> options)
+    public DiveShopperContext(DbContextOptions<DiveShopperContext> options)
         : base(options)
     {
     }
@@ -427,6 +427,7 @@ public partial class diveShopperContext : DbContext
             entity.ToTable("tMmemberList");
 
             entity.Property(e => e.MemberId).HasColumnName("memberId");
+            entity.Property(e => e.LockoutEnd).HasColumnType("datetime");
             entity.Property(e => e.MemberAddress)
                 .HasMaxLength(80)
                 .HasColumnName("memberAddress");
@@ -453,6 +454,8 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.RecentLogin)
                 .HasColumnType("datetime")
                 .HasColumnName("recentLogin");
+            entity.Property(e => e.ResetPasswordToken).HasMaxLength(255);
+            entity.Property(e => e.ResetPasswordTokenExpiry).HasColumnType("datetime");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.ThirdPartyId)
                 .HasMaxLength(255)
@@ -934,6 +937,7 @@ public partial class diveShopperContext : DbContext
             entity.Property(e => e.Evaluate).HasColumnName("evaluate");
             entity.Property(e => e.NumberOfPeople).HasColumnName("numberOfPeople");
             entity.Property(e => e.Photo).HasColumnName("photo");
+            entity.Property(e => e.Region).HasColumnName("region");
             entity.Property(e => e.SiteEmail).HasColumnName("siteEmail");
             entity.Property(e => e.SitePhone)
                 .HasMaxLength(50)
