@@ -31,6 +31,8 @@ public partial class TSsiteDetail
 
     public string SiteEmail { get; set; }
 
+    public int? Region { get; set; }
+
     public virtual ICollection<TSorder> TSorders { get; set; } = new List<TSorder>();
 
     public virtual ICollection<TSphoto> TSphotos { get; set; } = new List<TSphoto>();

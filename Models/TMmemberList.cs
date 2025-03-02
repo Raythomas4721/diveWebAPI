@@ -35,6 +35,14 @@ public partial class TMmemberList
 
     public string ThirdPartyProvider { get; set; }
 
+    public DateTime? LockoutEnd { get; set; }
+
+    public int? LoginAttempts { get; set; }
+
+    public string ResetPasswordToken { get; set; }
+
+    public DateTime? ResetPasswordTokenExpiry { get; set; }
+
     public virtual ICollection<TCcourseReview> TCcourseReviews { get; set; } = new List<TCcourseReview>();
 
     public virtual ICollection<TCorder> TCorders { get; set; } = new List<TCorder>();

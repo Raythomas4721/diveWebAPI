@@ -1,4 +1,4 @@
-﻿namespace diveWebAPI.Models // 調整命名空間以符合你的專案結構
+﻿namespace diveWebAPI.Models 
 {
     public class EmailSettings
     {

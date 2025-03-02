@@ -1,7 +1,8 @@
-﻿namespace diveWebAPI.Services // 調整命名空間以符合你的專案結構
+﻿namespace diveWebAPI.Services
 {
     public interface IEmailService
     {
         Task SendVerificationCodeAsync(string email, string code);
+        Task SendEmailAsync(string toEmail, string subject, string htmlBody);
     }
 }
