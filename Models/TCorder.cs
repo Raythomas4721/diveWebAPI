@@ -21,6 +21,8 @@ public partial class TCorder
 
     public bool? OrderStatus { get; set; }
 
+    public string PaymentMethod { get; set; }
+
     public virtual TCcourse Course { get; set; }
 
     public virtual TMmemberList Member { get; set; }

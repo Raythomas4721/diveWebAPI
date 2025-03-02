@@ -62,22 +62,19 @@ namespace diveWebAPI.Controllers
                 return NotFound(); // 回傳 404
             }
 
-            // 🚀 轉換 CoachPhoto 為 Base64
-            //string base64CoachPhoto = tCcourse.Coach.CoachPhoto != null && tCcourse.Coach.CoachPhoto.Length > 0
-            //    ? Convert.ToBase64String(tCcourse.Coach.CoachPhoto)
-            //    : null;
+            
 
-            // 🚀 轉換 CoachPhoto 為 Base64，並確保 Coach 不為 null
+            // 轉換 CoachPhoto 為 Base64，並確保 Coach 不為 null
             string base64CoachPhoto = (tCcourse.Coach != null && tCcourse.Coach.CoachPhoto != null && tCcourse.Coach.CoachPhoto.Length > 0)
                 ? Convert.ToBase64String(tCcourse.Coach.CoachPhoto)
                 : null;
 
-            // 🚀 轉換課程圖片（如果是 `byte[]`）
+            // 轉換課程圖片（如果是 `byte[]`）
             string base64Photo = tCcourse.Photo != null && tCcourse.Photo.Length > 0
                 ? Convert.ToBase64String(tCcourse.Photo)
                 : null;
 
-            // 🚀 建立回傳 JSON
+            // 建立回傳 JSON
             var response = new
             {
                 CourseId = tCcourse.CourseId,

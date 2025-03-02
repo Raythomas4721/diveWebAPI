@@ -23,6 +23,14 @@ public partial class TSsiteDetail
 
     public int? Collect { get; set; }
 
+    public decimal? SitePrice { get; set; }
+
+    public string SiteSize { get; set; }
+
+    public string SitePhone { get; set; }
+
+    public string SiteEmail { get; set; }
+
     public virtual ICollection<TSorder> TSorders { get; set; } = new List<TSorder>();
 
     public virtual ICollection<TSphoto> TSphotos { get; set; } = new List<TSphoto>();
