@@ -70,7 +70,7 @@ namespace diveWebAPI.Controllers
             [FromQuery] string? search,
             [FromQuery] string? order,
             [FromQuery] int page = 1,
-            [FromQuery] int size = 0
+            [FromQuery] int size = 6
         )
         {
             // (A) 準備一個 IQueryable
