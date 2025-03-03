@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using diveWebAPI.Services; // 假設 IEmailService 在這個命名空間中
+using diveWebAPI.Services; 
 using System.Net.Http;
 
 namespace diveWebAPI.Controllers
