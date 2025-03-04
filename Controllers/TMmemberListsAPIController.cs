@@ -54,7 +54,7 @@ namespace diveWebAPI.Controllers
 
             if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.MemberPassword))
             {
-                user.LoginAttempts += 1;
+                user.LoginAttempts = user.LoginAttempts.HasValue ? user.LoginAttempts.Value + 1 : 1;
 
                 if (user.LoginAttempts >= 4)
                 {
@@ -91,7 +91,7 @@ namespace diveWebAPI.Controllers
 
                 _context.TMmemberLists.Update(user);
                 await _context.SaveChangesAsync();
-                return Unauthorized(new { status = false, message = $"帳號或密碼錯誤，您還有 {4 - user.LoginAttempts} 次嘗試機會" });
+                return Unauthorized(new { status = false, message = $"帳號或密碼錯誤，您還有 {3 - user.LoginAttempts} 次嘗試機會" });
             }
 
             user.LoginAttempts = 0;
