@@ -233,7 +233,7 @@ namespace diveWebAPI.Controllers
                 _context.TCorders.Add(tcorder);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { message = $"訂單已建立，編號: {tcorder.OrderId}", orderId = tcorder.OrderId });
+                return Ok(new { message = $"訂單已建立，編號: {tcorder.OrderId}", orderId = tcorder.OrderId, amount = tcorder.CoursePrice * tcorder.Quantity });
             }
             catch (DbUpdateException dbEx)
             {
