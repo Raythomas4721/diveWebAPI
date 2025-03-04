@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using diveWebAPI.Models;
+using diveWebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +36,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.SetIsOriginAllowed(_ => true) 
+            policy.SetIsOriginAllowed(_ => true)
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -70,8 +71,11 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
         ValidIssuer = "diveShopper",
         ValidAudience = "diveShopperClient",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("aPj4eQm9TzGdK7xF5sLzN3vW8HcJ1dXq")),
+            // 確保 `userId` 被當作 NameIdentifier
+            NameClaimType = "userId"
         };
+
 })
 .AddGoogle(googleOptions =>
 {
@@ -87,6 +91,10 @@ builder.Services.AddAuthentication(options =>
 
     googleOptions.ClaimActions.MapJsonKey("picture", "picture", "url");
     });
+
+// 註冊 Email 服務
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // 啟用授權
 builder.Services.AddAuthorization();

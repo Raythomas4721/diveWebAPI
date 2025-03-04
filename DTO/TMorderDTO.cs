@@ -12,5 +12,13 @@
         public int? OrderLogId { get; set; }
         public DateTime? OrderDate { get; set; }
         public int? SiteId { get; set; }
+        public List<OrderDetailDTO> Details { get; set; } = new List<OrderDetailDTO>(); 
+    }
+
+    public class OrderDetailDTO
+    {
+        public string ItemName { get; set; } 
+        public int Quantity { get; set; }    
+        public decimal TotalPrice { get; set; } 
     }
 }

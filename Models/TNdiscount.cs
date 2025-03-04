@@ -11,7 +11,7 @@ public partial class TNdiscount
 
     public string DiscountName { get; set; }
 
-    public int? OrderDetailId { get; set; }
+    public int? ProductCategoryId { get; set; }
 
     public decimal? DiscountValue { get; set; }
 
@@ -20,5 +20,4 @@ public partial class TNdiscount
     public DateTime? EndDate { get; set; }
 
     public virtual TNproductCategory ProductCategory { get; set; }
-    public int? ProductCategoryId { get; set; } 
 }

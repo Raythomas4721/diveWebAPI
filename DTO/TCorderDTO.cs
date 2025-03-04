@@ -12,6 +12,7 @@
         public string? CourseName { get; set; } = "未知課程";//Model裡沒有，顯示需要，自TCcourses & TCcourseCategory中的欄位拼接
 
         //課程名稱是字串拼接成的
+        
 
         public decimal? CoursePrice { get; set; }
 
@@ -24,5 +25,7 @@
         public string LevelName { get; set; } = "無等級";
         public string CoachName { get; set; } = "無教練";
         public DateTime? StartAt { get; set; }
+        public string? Photo { get; set; }
+
     }
 }
