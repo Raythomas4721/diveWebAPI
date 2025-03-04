@@ -36,14 +36,13 @@ namespace diveWebAPI.Controllers
         //    return await _context.TSsiteDetails.ToListAsync();
         //}
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TSsiteDetail>>> GetTSsiteDetails(int region)
+        public async Task<ActionResult<PagedResult<TSsiteDetail>>> GetTSsiteDetails(
+    int region,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 2)  // 預設每頁2筆
         {
             IQueryable<TSsiteDetail> query = _context.TSsiteDetails;
 
-
-
-            // 根據區域篩選場地，這裡假設 VenueAddress 包含區域資訊
-            // 你可能需要調整篩選條件，以符合你的實際資料結構
             if (region == 1)
             {
                 query = query.Where(s => s.Region == 1);
@@ -60,12 +59,35 @@ namespace diveWebAPI.Controllers
             {
                 query = query.Where(s => s.Region == 4);
             }
-            else 
+
+            // 計算總筆數
+            var totalItems = await query.CountAsync();
+
+            // 分頁處理
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // 回傳分頁結果
+            return new PagedResult<TSsiteDetail>
             {
-                query.ToList();
-                //return await query.ToListAsync();
-            }
-            return query.ToList();
+                Items = items,
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+            };
+        }
+
+        // 新增分頁結果類
+        public class PagedResult<T>
+        {
+            public List<T> Items { get; set; }
+            public int TotalItems { get; set; }
+            public int Page { get; set; }
+            public int PageSize { get; set; }
+            public int TotalPages { get; set; }
         }
 
 
@@ -73,24 +95,37 @@ namespace diveWebAPI.Controllers
 
         // GET: api/TSsiteDetails/Search?keyword=yourKeyword
         [HttpGet("Search")]
-        public async Task<ActionResult<IEnumerable<TSsiteDetail>>> SearchTSsiteDetails(string keyword)
+        public async Task<ActionResult<PagedResult<TSsiteDetail>>> SearchTSsiteDetails(
+    string keyword,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 2)
         {
             if (string.IsNullOrEmpty(keyword))
             {
-                return await GetTSsiteDetails(0); // 如果沒有關鍵字，則回傳所有場地
+                return await GetTSsiteDetails(0, page, pageSize); // 使用正確的參數
             }
 
-            //使用關鍵字搜尋 VenueName 或 Detail 欄位
-           var results = await _context.TSsiteDetails
-                .Where(s => s.VenueName.Contains(keyword) || s.Detail.Contains(keyword))
+            IQueryable<TSsiteDetail> query = _context.TSsiteDetails
+                .Where(s => s.VenueName.Contains(keyword) || s.Detail.Contains(keyword));
+
+            // 計算總筆數
+            var totalItems = await query.CountAsync();
+
+            // 應用分頁
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            if (results == null || results.Count == 0)
+            // 回傳分頁結果
+            return new PagedResult<TSsiteDetail>
             {
-                return NotFound("找不到符合條件的場地。");
-            }
-
-            return results;
+                Items = items,
+                TotalItems = totalItems,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+            };
         }
 
         // GET: api/TSsiteDetails/5
